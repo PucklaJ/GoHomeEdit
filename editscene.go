@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strconv"
+
 	framework "github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK"
 	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK/gtk"
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
@@ -9,7 +11,8 @@ import (
 )
 
 type EditScene struct {
-	cube gohome.Entity3D // Test
+	cube      gohome.Entity3D // Test
+	lb_assets gtk.ListBox
 }
 
 func (this *EditScene) InitGUI() {
@@ -21,6 +24,8 @@ func (this *EditScene) InitGUI() {
 
 	window := builder.GetObject("window").ToWidget().ToWindow()
 	glarea := builder.GetObject("glarea").ToGLArea()
+	this.lb_assets = builder.GetObject("lb_assets").ToListBox()
+	menu_quit := builder.GetObject("menu_quit").ToMenuItem()
 
 	gohome.Framew.(*framework.GTKFramework).InitExternalDefault(&window, &glarea)
 	glarea.ToWidget().Show()
@@ -28,6 +33,9 @@ func (this *EditScene) InitGUI() {
 	glarea.ToWidget().SignalConnect("size-allocate", func(widget gtk.Widget) {
 		w, h := widget.GetSize()
 		gohome.Render.SetNativeResolution(uint32(w), uint32(h))
+	})
+	menu_quit.SignalConnect("activate", func(menuItem gtk.MenuItem) {
+		gohome.MainLop.Quit()
 	})
 }
 
@@ -47,6 +55,12 @@ func (this *EditScene) InitTest() {
 	this.cube.Transform.Position = [3]float32{0.0, 0.0, -3.0}
 
 	gohome.RenderMgr.AddObject(&this.cube)
+	for i := 0; i < 20; i++ {
+		lbl := gtk.LabelNew("Test Asset " + strconv.FormatInt(int64(i), 2))
+		this.lb_assets.Insert(lbl.ToWidget(), -1)
+		lbl.ToWidget().Show()
+	}
+
 }
 
 func (this *EditScene) Init() {
