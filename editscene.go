@@ -10,9 +10,6 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-var lb_assets gtk.ListBox
-var camera gohome.Camera3D
-
 type EditScene struct {
 	cube gohome.Entity3D // Test
 }
@@ -36,6 +33,7 @@ func (this *EditScene) InitGUI() {
 	builder.GetObject("tool_move").ToToolButton().SignalConnect(onToolMove)
 	builder.GetObject("tool_rotate").ToToolButton().SignalConnect(onToolRotate)
 	builder.GetObject("tool_scale").ToToolButton().SignalConnect(onToolScale)
+	builder.GetObject("tool_load_model").ToToolButton().SignalConnect(onToolLoadModel)
 }
 
 func (this *EditScene) InitGraphics() {

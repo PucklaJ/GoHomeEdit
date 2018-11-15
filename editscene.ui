@@ -5,7 +5,7 @@
   <object class="GtkImage" id="image1">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="stock">gtk-add</property>
+    <property name="stock">gtk-goto-first</property>
   </object>
   <object class="GtkImage" id="image2">
     <property name="visible">True</property>
@@ -21,6 +21,11 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="stock">gtk-undo</property>
+  </object>
+  <object class="GtkImage" id="image5">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-add</property>
   </object>
   <object class="GtkWindow" id="window">
     <property name="visible">True</property>
@@ -344,6 +349,7 @@
                 <property name="name">tool_place</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Place</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">image1</property>
               </object>
@@ -357,6 +363,7 @@
                 <property name="name">tool_move</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Move</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">image2</property>
               </object>
@@ -370,6 +377,7 @@
                 <property name="name">tool_rotate</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Rotate</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">image3</property>
               </object>
@@ -383,8 +391,33 @@
                 <property name="name">tool_scale</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Scale</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">image4</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSeparatorToolItem">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolButton" id="tool_load_model">
+                <property name="name">tool_load_model</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="tooltip_text" translatable="yes">Load Model</property>
+                <property name="use_underline">True</property>
+                <property name="icon_widget">image5</property>
               </object>
               <packing>
                 <property name="expand">False</property>
