@@ -1,12 +1,16 @@
 package main
 
 import (
-	"fmt"
 	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK/gtk"
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
 	"io/ioutil"
 	"os"
 )
+
+type LoadableModel struct {
+	Name         string
+	FileContents string
+}
 
 func updateResolution(widget gtk.Widget) {
 	w, h := widget.GetSize()
@@ -45,27 +49,17 @@ func onToolLoadModel(toolButton gtk.ToolButton) {
 	fileChooser := gtk.FileChooserDialogNew("Load Model", gtk.GetWindow(), gtk.FILE_CHOOSER_ACTION_OPEN)
 	if fileChooser.ToDialog().Run() == gtk.RESPONSE_ACCEPT {
 		filename := fileChooser.ToFileChooser().GetFilename()
-		fileChooser.ToWidget().Destroy()
 		file, _ := os.Open(filename)
 		contents, _ := ioutil.ReadAll(file)
-		fmt.Println(string(contents))
-		/*gohome.ErrorMgr.Log("Load", "Model", filename)
 		name := gohome.GetFileFromPath(filename)
-		gohome.ResourceMgr.LoadLevel(name, filename, true)
 
-		level := gohome.ResourceMgr.GetLevel(name)
-		if level != nil && len(level.LevelObjects) != 0 {
-			model := level.LevelObjects[0].Model3D
-			if model != nil {
-				loaded_models = append(loaded_models, model)
-				lbl := gtk.LabelNew(name)
-				lb_assets.Insert(lbl.ToWidget(), -1)
-				lbl.ToWidget().Show()
-			}
-		} else {
-			gohome.ErrorMgr.Error("Load", "Model", "Loaded model is broken")
-		}*/
-	} /* else {
+		var lm LoadableModel
+		lm.Name = name
+		lm.FileContents = string(contents)
+		loadable_models = append(loadable_models, lm)
+	} else {
 		gohome.ErrorMgr.Error("Load", "Model", "An error acoured")
-	}*/
+	}
+
+	fileChooser.ToWidget().Destroy()
 }

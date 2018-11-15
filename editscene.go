@@ -1,8 +1,6 @@
 package main
 
 import (
-	"strconv"
-
 	framework "github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK"
 	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK/gtk"
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
@@ -55,12 +53,6 @@ func (this *EditScene) InitTest() {
 	this.cube.Transform.Position = [3]float32{0.0, 0.0, -3.0}
 
 	gohome.RenderMgr.AddObject(&this.cube)
-	for i := 0; i < 20; i++ {
-		lbl := gtk.LabelNew("Test Asset " + strconv.FormatInt(int64(i), 2))
-		lb_assets.Insert(lbl.ToWidget(), -1)
-		lbl.ToWidget().Show()
-	}
-
 }
 
 func (this *EditScene) Init() {
@@ -71,6 +63,7 @@ func (this *EditScene) Init() {
 
 func (this *EditScene) Update(delta_time float32) {
 	this.cube.Transform.Rotation = this.cube.Transform.Rotation.Mul(mgl32.QuatRotate(mgl32.DegToRad(30.0)*delta_time, mgl32.Vec3{0.0, 1.0, 0.0})).Mul(mgl32.QuatRotate(mgl32.DegToRad(30.0)*delta_time, mgl32.Vec3{1.0, 0.0, 0.0}))
+	loadLoadableModels()
 }
 
 func (this *EditScene) Terminate() {
