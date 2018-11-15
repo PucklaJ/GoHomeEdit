@@ -10,9 +10,11 @@ import (
 	"golang.org/x/image/colornames"
 )
 
+var lb_assets gtk.ListBox
+var camera gohome.Camera3D
+
 type EditScene struct {
-	cube      gohome.Entity3D // Test
-	lb_assets gtk.ListBox
+	cube gohome.Entity3D // Test
 }
 
 func (this *EditScene) InitGUI() {
@@ -24,19 +26,16 @@ func (this *EditScene) InitGUI() {
 
 	window := builder.GetObject("window").ToWidget().ToWindow()
 	glarea := builder.GetObject("glarea").ToGLArea()
-	this.lb_assets = builder.GetObject("lb_assets").ToListBox()
-	menu_quit := builder.GetObject("menu_quit").ToMenuItem()
+	lb_assets = builder.GetObject("lb_assets").ToListBox()
 
 	gohome.Framew.(*framework.GTKFramework).InitExternalDefault(&window, &glarea)
-	glarea.ToWidget().Show()
 
-	glarea.ToWidget().SignalConnect("size-allocate", func(widget gtk.Widget) {
-		w, h := widget.GetSize()
-		gohome.Render.SetNativeResolution(uint32(w), uint32(h))
-	})
-	menu_quit.SignalConnect("activate", func(menuItem gtk.MenuItem) {
-		gohome.MainLop.Quit()
-	})
+	glarea.ToWidget().SignalConnect("size-allocate", updateResolution)
+	builder.GetObject("menu_quit").ToMenuItem().SignalConnect("activate", quitApplication)
+	builder.GetObject("tool_place").ToToolButton().SignalConnect(onToolPlace)
+	builder.GetObject("tool_move").ToToolButton().SignalConnect(onToolMove)
+	builder.GetObject("tool_rotate").ToToolButton().SignalConnect(onToolRotate)
+	builder.GetObject("tool_scale").ToToolButton().SignalConnect(onToolScale)
 }
 
 func (this *EditScene) InitGraphics() {
@@ -44,6 +43,9 @@ func (this *EditScene) InitGraphics() {
 	gohome.Init3DShaders()
 	gohome.RenderMgr.UpdateProjectionWithViewport = true
 	gohome.LightMgr.DisableLighting()
+
+	camera.Init()
+	gohome.RenderMgr.SetCamera3D(&camera, 0)
 }
 
 func (this *EditScene) InitTest() {
@@ -57,7 +59,7 @@ func (this *EditScene) InitTest() {
 	gohome.RenderMgr.AddObject(&this.cube)
 	for i := 0; i < 20; i++ {
 		lbl := gtk.LabelNew("Test Asset " + strconv.FormatInt(int64(i), 2))
-		this.lb_assets.Insert(lbl.ToWidget(), -1)
+		lb_assets.Insert(lbl.ToWidget(), -1)
 		lbl.ToWidget().Show()
 	}
 
