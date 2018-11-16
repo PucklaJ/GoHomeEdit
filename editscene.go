@@ -65,6 +65,12 @@ func (this *EditScene) Init() {
 func (this *EditScene) Update(delta_time float32) {
 	this.cube.Transform.Rotation = this.cube.Transform.Rotation.Mul(mgl32.QuatRotate(mgl32.DegToRad(30.0)*delta_time, mgl32.Vec3{0.0, 1.0, 0.0})).Mul(mgl32.QuatRotate(mgl32.DegToRad(30.0)*delta_time, mgl32.Vec3{1.0, 0.0, 0.0}))
 	loadLoadableModels()
+
+	if gohome.InputMgr.JustPressed(gohome.MouseButtonLeft) {
+		if !lb_assets.ToWidget().HasFocus() {
+			onLeftClick()
+		}
+	}
 }
 
 func (this *EditScene) Terminate() {

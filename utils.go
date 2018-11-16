@@ -29,7 +29,7 @@ func loadModel(name, fileContents, fileName string) {
 				loaded_models = make(map[uint32]*gohome.Model3D)
 			}
 			if placable_models == nil {
-				placable_models = make(map[uint32]PlaceableModel)
+				placable_models = make(map[uint32]*PlaceableModel)
 			}
 			loaded_models[object_id] = model
 
@@ -42,7 +42,7 @@ func loadModel(name, fileContents, fileName string) {
 			pm.Name = name
 			pm.Filename = fileName
 			pm.ID = object_id
-			placable_models[object_id] = pm
+			placable_models[object_id] = &pm
 			object_id++
 		}
 	} else {

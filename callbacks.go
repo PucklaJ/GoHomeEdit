@@ -4,7 +4,6 @@ import (
 	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK/gtk"
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
 	"io/ioutil"
-	"log"
 	"os"
 )
 
@@ -18,24 +17,19 @@ func quitApplication(menuItem gtk.MenuItem) {
 }
 
 func onToolPlace(toolButton gtk.ToolButton) {
+	current_mode = MODE_PLACE
 }
 
 func onToolMove(toolButton gtk.ToolButton) {
-	lb := gtk.LabelNew("ToolMove")
-	lb_assets.Insert(lb.ToWidget(), -1)
-	lb.ToWidget().Show()
+	current_mode = MODE_MOVE
 }
 
 func onToolRotate(toolButton gtk.ToolButton) {
-	lb := gtk.LabelNew("ToolRotate")
-	lb_assets.Insert(lb.ToWidget(), -1)
-	lb.ToWidget().Show()
+	current_mode = MODE_ROTATE
 }
 
 func onToolScale(toolButton gtk.ToolButton) {
-	lb := gtk.LabelNew("ToolPlace")
-	lb_assets.Insert(lb.ToWidget(), -1)
-	lb.ToWidget().Show()
+	current_mode = MODE_SCALE
 }
 
 func onToolLoadModel(toolButton gtk.ToolButton) {
@@ -63,4 +57,29 @@ func onSelectAsset(listBox gtk.ListBox, listBoxRow gtk.ListBoxRow) {
 	data := lbl.ToGObject().GetData("ID")
 	id := stringToUint32(data)
 	selected_model = id
+}
+
+func onLeftClick() {
+	if current_mode == MODE_PLACE {
+		pmodel, ok := placable_models[selected_model]
+		if ok {
+			if placed_models == nil {
+				placed_models = make(map[uint32]*PlacedModel)
+			}
+
+			model := loaded_models[pmodel.ID]
+			var pm PlacedModel
+			pm.Entity3D.InitModel(model)
+			pm.PlacedObject.Transform = pm.Entity3D.Transform
+			pm.PlacedObject.AABB = model.AABB
+			pm.PlacedObject.PlaceID = place_id
+			pm.PlaceableModel = pmodel
+			placed_models[place_id] = &pm
+
+			place_id++
+
+			gohome.RenderMgr.AddObject(&pm.Entity3D)
+			pm.PlacedObject.Transform.Position = camera.Position.Add(camera.LookDirection.Mul(3.0))
+		}
+	}
 }

@@ -39,5 +39,4 @@ type PlacedModel struct {
 	gohome.Entity3D
 	PlacedObject
 	*PlaceableModel
-	Filename string
 }
