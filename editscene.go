@@ -4,6 +4,7 @@ import (
 	framework "github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK"
 	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK/gtk"
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
+	"github.com/PucklaMotzer09/mathgl/mgl32"
 	"golang.org/x/image/colornames"
 )
 
@@ -41,11 +42,13 @@ func (this *EditScene) InitGraphics() {
 	gohome.LightMgr.DisableLighting()
 
 	camera.Init()
+	camera.LookAt(mgl32.Vec3{0.0, 0.0, MID_ZOOM}, camera_center, mgl32.Vec3{0.0, 1.0, 0.0})
 	gohome.RenderMgr.SetCamera3D(&camera, 0)
 	updateResolution(gtk.GetGLArea().ToWidget())
 }
 
 func (this *EditScene) InitTest() {
+
 }
 
 func (this *EditScene) Init() {
@@ -56,6 +59,7 @@ func (this *EditScene) Init() {
 
 func (this *EditScene) Update(delta_time float32) {
 	loadLoadableModels()
+	updateCamera()
 
 	if gohome.InputMgr.JustPressed(gohome.MouseButtonLeft) {
 		if !lb_assets.ToWidget().HasFocus() {

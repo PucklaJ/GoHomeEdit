@@ -1,6 +1,3 @@
-+ Load assets (mesh)
-    - .obj
-    - .dae
 + Transform Assets
     - Move, Rotate, Scale
 + Arrow drawing

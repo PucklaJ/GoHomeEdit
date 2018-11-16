@@ -86,7 +86,7 @@ func onLeftClick() {
 			place_id++
 
 			gohome.RenderMgr.AddObject(&pm.Entity3D)
-			pm.PlacedObject.Transform.Position = camera.Position.Add(camera.LookDirection.Mul(3.0))
+			pm.PlacedObject.Transform.Position = camera_center
 		}
 	}
 }
