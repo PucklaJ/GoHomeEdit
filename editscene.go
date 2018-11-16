@@ -26,6 +26,7 @@ func (this *EditScene) InitGUI() {
 	gohome.Framew.(*framework.GTKFramework).InitExternalDefault(&window, &glarea)
 
 	glarea.ToWidget().SignalConnect("size-allocate", updateResolution)
+	lb_assets.SignalConnect("row-selected", onSelectAsset)
 	builder.GetObject("menu_quit").ToMenuItem().SignalConnect("activate", quitApplication)
 	builder.GetObject("tool_place").ToToolButton().SignalConnect(onToolPlace)
 	builder.GetObject("tool_move").ToToolButton().SignalConnect(onToolMove)

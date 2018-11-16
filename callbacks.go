@@ -4,13 +4,9 @@ import (
 	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK/gtk"
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
 	"io/ioutil"
+	"log"
 	"os"
 )
-
-type LoadableModel struct {
-	Name         string
-	FileContents string
-}
 
 func updateResolution(widget gtk.Widget) {
 	w, h := widget.GetSize()
@@ -22,9 +18,6 @@ func quitApplication(menuItem gtk.MenuItem) {
 }
 
 func onToolPlace(toolButton gtk.ToolButton) {
-	lb := gtk.LabelNew("ToolPlace")
-	lb_assets.Insert(lb.ToWidget(), -1)
-	lb.ToWidget().Show()
 }
 
 func onToolMove(toolButton gtk.ToolButton) {
@@ -56,10 +49,18 @@ func onToolLoadModel(toolButton gtk.ToolButton) {
 		var lm LoadableModel
 		lm.Name = name
 		lm.FileContents = string(contents)
+		lm.Filename = filename
 		loadable_models = append(loadable_models, lm)
 	} else {
 		gohome.ErrorMgr.Error("Load", "Model", "An error acoured")
 	}
 
 	fileChooser.ToWidget().Destroy()
+}
+
+func onSelectAsset(listBox gtk.ListBox, listBoxRow gtk.ListBoxRow) {
+	lbl := listBoxRow.ToContainer().GetChildren().Data().ToLabel()
+	data := lbl.ToGObject().GetData("ID")
+	id := stringToUint32(data)
+	selected_model = id
 }
