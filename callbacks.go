@@ -52,6 +52,13 @@ func onToolLoadModel(toolButton gtk.ToolButton) {
 	fileChooser.ToWidget().Destroy()
 }
 
+var is_wireframe = false
+
+func onMenuWireframe(menuItem gtk.MenuItem) {
+	is_wireframe = !is_wireframe
+	gohome.RenderMgr.WireFrameMode = is_wireframe
+}
+
 func onSelectAsset(listBox gtk.ListBox, listBoxRow gtk.ListBoxRow) {
 	lbl := listBoxRow.ToContainer().GetChildren().Data().ToLabel()
 	data := lbl.ToGObject().GetData("ID")

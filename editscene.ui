@@ -198,7 +198,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkMenuItem" id="menu_wireframe">
+                      <object class="GtkCheckMenuItem" id="menu_wireframe">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Toggles Wireframe view</property>
