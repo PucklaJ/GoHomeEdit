@@ -43,6 +43,7 @@ func (this *EditScene) InitGraphics() {
 
 	camera.Init()
 	gohome.RenderMgr.SetCamera3D(&camera, 0)
+	updateResolution(gtk.GetGLArea().ToWidget())
 }
 
 func (this *EditScene) InitTest() {

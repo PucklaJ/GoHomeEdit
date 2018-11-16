@@ -3,3 +3,4 @@
 GoHomeEdit
 *.exe
 *~
+#*.ui#

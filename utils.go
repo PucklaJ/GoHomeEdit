@@ -19,7 +19,7 @@ func stringToUint32(str string) uint32 {
 
 func loadModel(name, fileContents, fileName string) {
 	gohome.ErrorMgr.Log("Load", "Model", name)
-	gohome.ResourceMgr.LoadLevelString(name, string(fileContents), "obj", true)
+	gohome.ResourceMgr.LoadLevelString(name, string(fileContents), fileName, true)
 
 	level := gohome.ResourceMgr.GetLevel(name)
 	if level != nil && len(level.LevelObjects) != 0 {
@@ -52,7 +52,15 @@ func loadModel(name, fileContents, fileName string) {
 
 func loadLoadableModels() {
 	for i := 0; i < len(loadable_models); i++ {
-		loadModel(loadable_models[i].Name, loadable_models[i].FileContents, loadable_models[i].Filename)
+		loadable_models[i].Life--
+		if loadable_models[i].Life == 0 {
+			loadModel(loadable_models[i].Name, loadable_models[i].FileContents, loadable_models[i].Filename)
+			if len(loadable_models) == 1 {
+				loadable_models = loadable_models[:0]
+			} else {
+				loadable_models = append(loadable_models[:i], loadable_models[i+1:]...)
+			}
+			i--
+		}
 	}
-	loadable_models = loadable_models[:0]
 }

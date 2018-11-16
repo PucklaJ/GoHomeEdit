@@ -17,6 +17,7 @@ type LoadableModel struct {
 	Name         string
 	FileContents string
 	Filename     string
+	Life         uint32
 }
 
 type PlaceableObject struct {
