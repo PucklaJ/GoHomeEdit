@@ -110,6 +110,10 @@ func resetSmoothDeltas() {
 func updateCameraRotation() {
 
 	dx, dy := float32(gohome.InputMgr.Mouse.DPos[0]), float32(gohome.InputMgr.Mouse.DPos[1])
+	if !gohome.InputMgr.IsPressed(gohome.MouseButtonRight) {
+		dx = 0.0
+		dy = 0.0
+	}
 	smooth_deltas[current_smooth_delta][0] = dx
 	smooth_deltas[current_smooth_delta][1] = dy
 	dx, dy = smoothDeltas()
@@ -120,12 +124,6 @@ func updateCameraRotation() {
 	yaw, pitch := mgl32.DegToRad(-dx*CAM_ROTATE_VELOCITY), mgl32.DegToRad(dy*CAM_ROTATE_VELOCITY)
 
 	if camera_pitch+pitch > mgl32.DegToRad(88.0) || camera_pitch+pitch < mgl32.DegToRad(-85.0) {
-		pitch = 0.0
-	}
-
-	if !gohome.InputMgr.IsPressed(gohome.MouseButtonRight) {
-		resetSmoothDeltas()
-		yaw = 0.0
 		pitch = 0.0
 	}
 
@@ -151,7 +149,25 @@ func updateCameraRotation() {
 	camera_pitch += pitch
 }
 
+var smooth_zooms [NUM_SMOOTH_ZOOM]float32
+var current_smooth_zoom int = 0
+
+func smoothZooms() float32 {
+	var sum float32 = 0.0
+	for i := 0; i < NUM_SMOOTH_ZOOM; i++ {
+		sum += smooth_zooms[i]
+	}
+	current_smooth_zoom++
+	if current_smooth_zoom == NUM_SMOOTH_ZOOM {
+		current_smooth_zoom = 0
+	}
+	return sum / float32(NUM_SMOOTH_ZOOM)
+}
+
 func updateCameraZoom() {
 	wy := float32(gohome.InputMgr.Mouse.Wheel[1])
-	camera_zoom -= wy * CAM_ZOOM_VELOCITY
+	zoom := wy * CAM_ZOOM_VELOCITY
+	smooth_zooms[current_smooth_zoom] = zoom
+	zoom = smoothZooms()
+	camera_zoom = mgl32.Clamp(camera_zoom-zoom, MIN_ZOOM, MAX_ZOOM)
 }
