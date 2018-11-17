@@ -6,10 +6,11 @@ import (
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
 	"github.com/PucklaMotzer09/mathgl/mgl32"
 	"golang.org/x/image/colornames"
+	"io/ioutil"
+	"os"
 )
 
 type EditScene struct {
-	cube gohome.Entity3D
 }
 
 func (this *EditScene) InitGUI() {
@@ -49,8 +50,41 @@ func (this *EditScene) InitGraphics() {
 }
 
 func (this *EditScene) InitTest() {
-	this.cube.InitMesh(gohome.Box("Center", mgl32.Vec3{0.5, 0.5, 0.5}))
-	gohome.RenderMgr.AddObject(&this.cube)
+	coin, _ := os.Open("files/Coin.obj")
+	gopher, _ := os.Open("files/gopher.obj")
+	hammer, _ := os.Open("files/Hammer.obj")
+	meat, _ := os.Open("files/Meat.obj")
+	sword, _ := os.Open("files/Sword.obj")
+
+	coinc, _ := ioutil.ReadAll(coin)
+	gopherc, _ := ioutil.ReadAll(gopher)
+	hammerc, _ := ioutil.ReadAll(hammer)
+	meatc, _ := ioutil.ReadAll(meat)
+	swordc, _ := ioutil.ReadAll(sword)
+
+	coin.Close()
+	gopher.Close()
+	hammer.Close()
+	meat.Close()
+	sword.Close()
+
+	loadable_models = append(loadable_models, []LoadableModel{
+		{
+			"Coin.obj", string(coinc), "files/Coin.obj",
+		},
+		{
+			"gopher.obj", string(gopherc), "files/gopher.obj",
+		},
+		{
+			"Hammer.obj", string(hammerc), "files/Hammer.obj",
+		},
+		{
+			"Meat.obj", string(meatc), "files/Meat.obj",
+		},
+		{
+			"Sword.obj", string(swordc), "files/Sword.obj",
+		},
+	}...)
 }
 
 func (this *EditScene) Init() {
@@ -68,7 +102,6 @@ func (this *EditScene) Update(delta_time float32) {
 			onLeftClick()
 		}
 	}
-	this.cube.Transform.Position = camera_center
 }
 
 func (this *EditScene) Terminate() {

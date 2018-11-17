@@ -53,17 +53,9 @@ func loadModel(name, fileContents, fileName string) {
 
 func loadLoadableModels() {
 	for i := 0; i < len(loadable_models); i++ {
-		loadable_models[i].Life--
-		if loadable_models[i].Life == 0 {
-			loadModel(loadable_models[i].Name, loadable_models[i].FileContents, loadable_models[i].Filename)
-			if len(loadable_models) == 1 {
-				loadable_models = loadable_models[:0]
-			} else {
-				loadable_models = append(loadable_models[:i], loadable_models[i+1:]...)
-			}
-			i--
-		}
+		loadModel(loadable_models[i].Name, loadable_models[i].FileContents, loadable_models[i].Filename)
 	}
+	loadable_models = loadable_models[:0]
 }
 
 func updateCamera() {

@@ -44,7 +44,6 @@ func onToolLoadModel(toolButton gtk.ToolButton) {
 		lm.Name = name
 		lm.FileContents = string(contents)
 		lm.Filename = filename
-		lm.Life = 1
 		loadable_models = append(loadable_models, lm)
 	} else {
 		gohome.ErrorMgr.Error("Load", "Model", "An error acoured")
