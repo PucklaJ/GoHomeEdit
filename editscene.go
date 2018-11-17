@@ -38,7 +38,7 @@ func (this *EditScene) InitGUI() {
 }
 
 func (this *EditScene) InitGraphics() {
-	gohome.Render.SetBackgroundColor(colornames.Lime)
+	gohome.Render.SetBackgroundColor(colornames.Lightgray)
 	gohome.Init3DShaders()
 	gohome.RenderMgr.UpdateProjectionWithViewport = true
 	gohome.LightMgr.DisableLighting()
@@ -47,6 +47,25 @@ func (this *EditScene) InitGraphics() {
 	camera.LookAt(mgl32.Vec3{0.0, 0.0, MID_ZOOM}, camera_center, mgl32.Vec3{0.0, 1.0, 0.0})
 	gohome.RenderMgr.SetCamera3D(&camera, 0)
 	updateResolution(gtk.GetGLArea().ToWidget())
+
+	gohome.ResourceMgr.LoadShaderSource("PlacingObject", gohome.ENTITY_3D_SHADER_VERTEX_SOURCE_OPENGL, PLACING_OBJECT_SHADER_FRAGMENT_SOURCE_OPENGL, "", "", "", "")
+	if gohome.ResourceMgr.GetShader("PlacingObject") == nil {
+		gohome.ResourceMgr.LoadShaderSource("PlacingObjectNoShadow", gohome.ENTITY_3D_NO_SHADOWS_SHADER_VERTEX_SOURCE_OPENGL, PLACING_OBJECT_NO_SHADOWS_SHADER_FRAGMENT_SOURCE_OPENGL, "", "", "", "")
+		if gohome.ResourceMgr.GetShader("PlacingObjectNoShadow") != nil {
+			gohome.ResourceMgr.SetShader("PlacingObject", "PlacingObjectNoShadow")
+		}
+	}
+	gohome.ResourceMgr.LoadShaderSource("PlacingObjectNoUV", gohome.ENTITY_3D_NOUV_SHADER_VERTEX_SOURCE_OPENGL, PLACING_MODEL_NOUV_SHADER_FRAGMENT_SOURCE_OPENGL, "", "", "", "")
+	if gohome.ResourceMgr.GetShader("PlacingObjectNoUV") == nil {
+		gohome.ResourceMgr.LoadShaderSource("PlacingObjectNoUVNoShadow", gohome.ENTITY_3D_NOUV_SHADER_VERTEX_SOURCE_OPENGL, PLACING_OBJECT_NOUV_NO_SHADOWS_SHADER_FRAGMENT_SOURCE_OPENGL, "", "", "", "")
+		if gohome.ResourceMgr.GetShader("PlacingObjectNoUVNoShadow") != nil {
+			gohome.ResourceMgr.SetShader("PlacingObjectNoUV", "PlacingObjectNoUVNoShadow")
+		}
+	}
+
+	placing_object.Visible = false
+	placing_object.RenderLast = true
+	gohome.RenderMgr.AddObject(&placing_object)
 }
 
 func (this *EditScene) InitTest() {
@@ -102,6 +121,8 @@ func (this *EditScene) Update(delta_time float32) {
 			onLeftClick()
 		}
 	}
+
+	updatePlacingObject()
 }
 
 func (this *EditScene) Terminate() {

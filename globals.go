@@ -23,3 +23,5 @@ var placed_models map[uint32]*PlacedModel
 var selected_model uint32
 
 var current_mode Mode = MODE_PLACE
+
+var placing_object gohome.Entity3D

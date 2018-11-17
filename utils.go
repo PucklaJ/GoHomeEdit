@@ -210,3 +210,25 @@ func updateCameraPanning() {
 	camera.Position = camera.Position.Add(vec)
 	camera_center = camera.Position.Add(camera.LookDirection.Mul(camera_zoom))
 }
+
+var prev_selected_model uint32 = 1000000
+
+func updatePlacingObject() {
+	if prev_selected_model != selected_model {
+		pmodel, ok := placable_models[selected_model]
+		if ok {
+			model := loaded_models[pmodel.ID]
+			placing_object.InitModel(model)
+			placing_object.RenderLast = true
+			if model.HasUV() {
+				placing_object.SetShader(gohome.ResourceMgr.GetShader("PlacingObject"))
+			} else {
+				placing_object.SetShader(gohome.ResourceMgr.GetShader("PlacingObjectNoUV"))
+			}
+		}
+		prev_selected_model = selected_model
+	}
+
+	placing_object.Transform.Position = camera_center
+	placing_object.Visible = current_mode == MODE_PLACE && placing_object.Model3D != nil
+}
