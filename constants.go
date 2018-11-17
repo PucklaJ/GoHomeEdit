@@ -7,8 +7,10 @@ const (
 
 	CAM_ROTATE_VELOCITY float32 = 0.5
 	CAM_ZOOM_VELOCITY   float32 = 0.5
+	CAM_PAN_VELOCITY    float32 = 0.025
 	MAX_DELTA           float32 = 200.0
 
 	NUM_SMOOTH_DELTAS int = 5
 	NUM_SMOOTH_ZOOM   int = 10
+	NUM_SMOOTH_PAN    int = 5
 )

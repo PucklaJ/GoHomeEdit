@@ -9,6 +9,7 @@ import (
 )
 
 type EditScene struct {
+	cube gohome.Entity3D
 }
 
 func (this *EditScene) InitGUI() {
@@ -48,7 +49,8 @@ func (this *EditScene) InitGraphics() {
 }
 
 func (this *EditScene) InitTest() {
-
+	this.cube.InitMesh(gohome.Box("Center", mgl32.Vec3{0.5, 0.5, 0.5}))
+	gohome.RenderMgr.AddObject(&this.cube)
 }
 
 func (this *EditScene) Init() {
@@ -66,6 +68,7 @@ func (this *EditScene) Update(delta_time float32) {
 			onLeftClick()
 		}
 	}
+	this.cube.Transform.Position = camera_center
 }
 
 func (this *EditScene) Terminate() {

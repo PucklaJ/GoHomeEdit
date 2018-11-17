@@ -69,6 +69,7 @@ func loadLoadableModels() {
 func updateCamera() {
 	updateCameraZoom()
 	updateCameraRotation()
+	updateCameraPanning()
 }
 
 var smooth_deltas [NUM_SMOOTH_DELTAS][2]float32
@@ -111,8 +112,7 @@ func updateCameraRotation() {
 
 	dx, dy := float32(gohome.InputMgr.Mouse.DPos[0]), float32(gohome.InputMgr.Mouse.DPos[1])
 	if !gohome.InputMgr.IsPressed(gohome.MouseButtonRight) {
-		dx = 0.0
-		dy = 0.0
+		dx, dy = 0.0, 0.0
 	}
 	smooth_deltas[current_smooth_delta][0] = dx
 	smooth_deltas[current_smooth_delta][1] = dy
@@ -120,7 +120,6 @@ func updateCameraRotation() {
 	if mgl32.Abs(dx) > MAX_DELTA || mgl32.Abs(dy) > MAX_DELTA {
 		return
 	}
-
 	yaw, pitch := mgl32.DegToRad(-dx*CAM_ROTATE_VELOCITY), mgl32.DegToRad(dy*CAM_ROTATE_VELOCITY)
 
 	if camera_pitch+pitch > mgl32.DegToRad(88.0) || camera_pitch+pitch < mgl32.DegToRad(-85.0) {
@@ -130,7 +129,7 @@ func updateCameraRotation() {
 	pos := mgl32.Vec3{0.0, 0.0, 1.0}
 	look := mgl32.Vec3{0.0, 0.0, -1.0}
 	up := mgl32.Vec3{0.0, 1.0, 0.0}
-	relVec := pos.Sub(camera_center).Normalize()
+	relVec := pos
 
 	rotateAxisPitch := up.Cross(look).Normalize()
 	rotatePitch := mgl32.HomogRotate3D(camera_pitch, rotateAxisPitch)
@@ -170,4 +169,52 @@ func updateCameraZoom() {
 	smooth_zooms[current_smooth_zoom] = zoom
 	zoom = smoothZooms()
 	camera_zoom = mgl32.Clamp(camera_zoom-zoom, MIN_ZOOM, MAX_ZOOM)
+}
+
+var smooth_pans [NUM_SMOOTH_PAN][2]float32
+var current_smooth_pan int = 0
+
+func smoothPans() (float32, float32) {
+	var sumx, sumy float32 = 0.0, 0.0
+	for i := 0; i < NUM_SMOOTH_PAN; i++ {
+		sumx += smooth_pans[i][0]
+		sumy += smooth_pans[i][1]
+	}
+
+	current_smooth_pan++
+	if current_smooth_pan == NUM_SMOOTH_PAN {
+		current_smooth_pan = 0
+	}
+
+	return sumx / float32(NUM_SMOOTH_PAN), sumy / float32(NUM_SMOOTH_PAN)
+}
+
+func updateCameraPanning() {
+
+	dx, dy := float32(gohome.InputMgr.Mouse.DPos[0]), float32(gohome.InputMgr.Mouse.DPos[1])
+	if !gohome.InputMgr.IsPressed(gohome.MouseButtonMiddle) {
+		dx, dy = 0.0, 0.0
+	}
+	smooth_pans[current_smooth_pan][0] = dx
+	smooth_pans[current_smooth_pan][1] = dy
+	dx, dy = smoothPans()
+	if mgl32.Abs(dx) > MAX_DELTA || mgl32.Abs(dy) > MAX_DELTA {
+		return
+	}
+
+	panx, pany := dx*CAM_PAN_VELOCITY, dy*CAM_PAN_VELOCITY
+
+	up := mgl32.Vec3{0.0, 1.0, 0.0}
+	look := mgl32.Vec3{0.0, 0.0, -1.0}
+
+	rotateAxisPitch := up.Cross(look).Normalize()
+	rotatePitch := mgl32.HomogRotate3D(camera_pitch, rotateAxisPitch)
+	rotateAxisYaw := mgl32.Vec3{0.0, 1.0, 0.0}
+	rotateYaw := mgl32.HomogRotate3D(camera_yaw, rotateAxisYaw)
+
+	up = rotateYaw.Mul4(rotatePitch).Mul4x1(up.Vec4(0.0)).Vec3()
+	right := up.Cross(camera.LookDirection).Normalize()
+	vec := up.Mul(pany).Add(right.Mul(panx))
+	camera.Position = camera.Position.Add(vec)
+	camera_center = camera.Position.Add(camera.LookDirection.Mul(camera_zoom))
 }
