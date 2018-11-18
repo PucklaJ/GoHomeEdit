@@ -1,7 +1,7 @@
 + Transform Assets
     - Move, Rotate, Scale
 + Arrow drawing
-    - For move, scale, rotate
+    - For rotate
     - draw 3D model
 + Save as xml format
 + Load file
