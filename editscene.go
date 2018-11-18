@@ -66,6 +66,9 @@ func (this *EditScene) InitGraphics() {
 	placing_object.Visible = false
 	placing_object.RenderLast = true
 	gohome.RenderMgr.AddObject(&placing_object)
+
+	var arrows Arrows
+	arrows.Init()
 }
 
 func (this *EditScene) InitTest() {
