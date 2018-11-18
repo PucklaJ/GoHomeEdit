@@ -24,4 +24,4 @@ var selected_model uint32
 
 var current_mode Mode = MODE_PLACE
 
-var placing_object gohome.Entity3D
+var placing_object PlacingObject
