@@ -11,6 +11,7 @@ import (
 )
 
 type EditScene struct {
+	gohome.NilRenderObject
 }
 
 func (this *EditScene) InitGUI() {
@@ -91,6 +92,8 @@ func (this *EditScene) InitTest() {
 			"Sword.obj", string(swordc), "files/Sword.obj",
 		},
 	}...)
+
+	gohome.RenderMgr.AddObject(this)
 }
 
 func (this *EditScene) Init() {
@@ -107,6 +110,12 @@ func (this *EditScene) Update(delta_time float32) {
 			onLeftClick()
 		}
 	}
+
+}
+
+func (this *EditScene) Render() {
+	ray := gohome.InputMgr.Mouse.ToRay()
+	gohome.DrawLine3D(camera_center, camera.Position.Add(ray))
 }
 
 func (this *EditScene) Terminate() {

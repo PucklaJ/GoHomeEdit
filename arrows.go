@@ -174,8 +174,6 @@ func (this *Arrows) Update(detla_time float32) {
 
 	if len(placed_models) != 0 {
 		this.SetParent(&placed_models[place_id-1].Entity3D)
-		placed_models[place_id-1].Entity3D.Transform.Rotation = mgl32.QuatRotate(rotate, mgl32.Vec3{1.0, 0.0, 0.0})
-		rotate += detla_time
 	}
 }
 

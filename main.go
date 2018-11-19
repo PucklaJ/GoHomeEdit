@@ -7,5 +7,8 @@ import (
 )
 
 func main() {
-	gohome.MainLop.Run(&framework.GTKFramework{UseWholeWindowAsGLArea: false}, &renderer.OpenGLRenderer{}, 1280, 720, "GoHomeEdit", &EditScene{})
+	gohome.MainLop.Run(&framework.GTKFramework{
+		UseWholeWindowAsGLArea: false,
+		MenuBarFix:             true,
+	}, &renderer.OpenGLRenderer{}, 1280, 720, "GoHomeEdit", &EditScene{})
 }
