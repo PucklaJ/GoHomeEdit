@@ -24,28 +24,31 @@ func loadModel(name, fileContents, fileName string) {
 
 	level := gohome.ResourceMgr.GetLevel(name)
 	if level != nil && len(level.LevelObjects) != 0 {
-		model := level.LevelObjects[0].Model3D
-		if model != nil {
-			if loaded_models == nil {
-				loaded_models = make(map[uint32]*gohome.Model3D)
-			}
-			if placable_models == nil {
-				placable_models = make(map[uint32]*PlaceableModel)
-			}
-			loaded_models[object_id] = model
+		for i := 0; i < len(level.LevelObjects); i++ {
+			model := level.LevelObjects[i].Model3D
+			if model != nil {
+				if loaded_models == nil {
+					loaded_models = make(map[uint32]*gohome.Model3D)
+				}
+				if placable_models == nil {
+					placable_models = make(map[uint32]*PlaceableModel)
+				}
+				loaded_models[object_id] = model
 
-			lbl := gtk.LabelNew(name)
-			lbl.ToGObject().SetData("ID", uint32ToString(object_id))
-			lb_assets.Insert(lbl.ToWidget(), -1)
-			lbl.ToWidget().Show()
+				lbl := gtk.LabelNew(model.Name)
+				lbl.ToGObject().SetData("ID", uint32ToString(object_id))
+				lb_assets.Insert(lbl.ToWidget(), -1)
+				lbl.ToWidget().Show()
 
-			var pm PlaceableModel
-			pm.Name = name
-			pm.Filename = fileName
-			pm.ID = object_id
-			placable_models[object_id] = &pm
-			object_id++
+				var pm PlaceableModel
+				pm.Name = model.Name
+				pm.Filename = fileName
+				pm.ID = object_id
+				placable_models[object_id] = &pm
+				object_id++
+			}
 		}
+
 	} else {
 		gohome.ErrorMgr.Error("Load", "Model", "Loaded model is broken")
 	}

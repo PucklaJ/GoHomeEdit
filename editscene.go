@@ -42,6 +42,7 @@ func (this *EditScene) InitGraphics() {
 	gohome.Init3DShaders()
 	gohome.RenderMgr.UpdateProjectionWithViewport = true
 	gohome.LightMgr.DisableLighting()
+	gohome.ResourceMgr.LoadModelsWithSameName = true
 
 	camera.Init()
 	camera.LookAt(mgl32.Vec3{0.0, 0.0, MID_ZOOM}, camera_center, mgl32.Vec3{0.0, 1.0, 0.0})

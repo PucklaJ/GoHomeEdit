@@ -272,9 +272,9 @@ func (this *Arrows) getMovePosAndDirections() (pos, xdir, ydir, zdir mgl32.Vec2)
 	x := mgl32.Vec3{1.0, 0.0, 0.0}
 	y := mgl32.Vec3{0.0, 1.0, 0.0}
 	z := mgl32.Vec3{0.0, 0.0, 1.0}
-	xpos := this.translateX.Transform.Position
-	ypos := this.translateY.Transform.Position
-	zpos := this.translateZ.Transform.Position
+	xpos := this.translateX.Transform.GetTransformMatrix().Mul4x1([4]float32{0.0, 0.0, 0.0, 1.0}).Vec3()
+	ypos := xpos
+	zpos := xpos
 	scale := this.translateX.Transform.Scale[0]
 	var wg sync.WaitGroup
 	wg.Add(4)
