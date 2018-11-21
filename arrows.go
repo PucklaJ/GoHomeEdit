@@ -4,6 +4,7 @@ import (
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
 	"github.com/PucklaMotzer09/mathgl/mgl32"
 	"golang.org/x/image/colornames"
+	"sync"
 )
 
 const (
@@ -189,4 +190,64 @@ func (this *Arrows) SetParent(parent interface{}) {
 	/*this.rotateX.SetParent(parent)
 	this.rotateY.SetParent(parent)
 	this.rotateZ.SetParent(parent)*/
+}
+
+func transformAABB(aabb *gohome.AxisAlignedBoundingBox, transform *gohome.TransformableObject3D, wg *sync.WaitGroup) {
+	tmat := transform.GetTransformMatrix()
+	vmat := camera.GetViewMatrix()
+	pmat := gohome.RenderMgr.Projection3D.GetProjectionMatrix()
+	mat := pmat.Mul4(vmat).Mul4(tmat)
+	min4 := mat.Mul4x1(aabb.Min.Vec4(1))
+	max4 := mat.Mul4x1(aabb.Max.Vec4(1))
+	min3 := min4.Div(min4.W()).Vec3()
+	max3 := max4.Div(max4.W()).Vec3()
+	aabb.Min = min3.Div(min3.Z())
+	aabb.Max = max3.Div(max3.Z())
+	nres := gohome.Render.GetNativeResolution()
+
+	min, max := aabb.Min.Vec2(), aabb.Max.Vec2()
+	min = min.MulVec([2]float32{1.0, -1.0}).Add([2]float32{1.0, 1.0}).DivVec([2]float32{2.0, 2.0}).MulVec(nres)
+	max = max.MulVec([2]float32{1.0, -1.0}).Add([2]float32{1.0, 1.0}).DivVec([2]float32{2.0, 2.0}).MulVec(nres)
+
+	aabb.Min = min.Vec3(-1.0)
+	aabb.Max = max.Vec3(-1.0)
+
+	wg.Done()
+}
+
+func (this *Arrows) getMoveAABBs() (gohome.AxisAlignedBoundingBox, gohome.AxisAlignedBoundingBox, gohome.AxisAlignedBoundingBox) {
+	aabbx := this.translateX.Model3D.AABB
+	aabby := this.translateY.Model3D.AABB
+	aabbz := this.translateZ.Model3D.AABB
+	var wg sync.WaitGroup
+
+	wg.Add(5)
+	go func() {
+		camera.CalculateViewMatrix()
+		wg.Done()
+	}()
+	go func() {
+		gohome.RenderMgr.Projection3D.CalculateProjectionMatrix()
+		wg.Done()
+	}()
+	go func() {
+		this.translateX.Transform.CalculateTransformMatrix(&gohome.RenderMgr, -1)
+		wg.Done()
+	}()
+	go func() {
+		this.translateY.Transform.CalculateTransformMatrix(&gohome.RenderMgr, -1)
+		wg.Done()
+	}()
+	go func() {
+		this.translateZ.Transform.CalculateTransformMatrix(&gohome.RenderMgr, -1)
+		wg.Done()
+	}()
+	wg.Wait()
+
+	wg.Add(3)
+	go transformAABB(&aabbx, this.translateX.Transform, &wg)
+	go transformAABB(&aabby, this.translateY.Transform, &wg)
+	go transformAABB(&aabbz, this.translateZ.Transform, &wg)
+	wg.Wait()
+	return aabbx, aabby, aabbz
 }

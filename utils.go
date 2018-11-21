@@ -5,6 +5,7 @@ import (
 	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK/gtk"
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
 	"github.com/PucklaMotzer09/mathgl/mgl32"
+	"log"
 )
 
 func uint32ToString(i uint32) string {
@@ -209,4 +210,48 @@ func updateCameraPanning() {
 	vec := up.Mul(pany).Add(right.Mul(panx))
 	camera.Position = camera.Position.Add(vec)
 	camera_center = camera.Position.Add(camera.LookDirection.Mul(camera_zoom))
+}
+
+func getRectForAABB(aabb gohome.AxisAlignedBoundingBox) (pos mgl32.Vec2, size mgl32.Vec2) {
+	max, min := aabb.Max.Vec2(), aabb.Min.Vec2()
+	maxreal := max
+	minreal := min
+
+	if min.X() > maxreal.X() {
+		maxreal[0] = min.X()
+	}
+	if min.Y() > maxreal.Y() {
+		maxreal[1] = min.Y()
+	}
+	if max.X() < minreal.X() {
+		minreal[0] = max.X()
+	}
+	if max.Y() < minreal.Y() {
+		minreal[1] = max.Y()
+	}
+
+	pos = minreal
+	size = maxreal.Sub(minreal)
+	return
+}
+
+func intersects(mpos, pos, size mgl32.Vec2) bool {
+	return mpos[0] > pos[0] && mpos[0] < pos[0]+size[0] &&
+		mpos[1] > pos[1] && mpos[1] < pos[1]+size[1]
+}
+
+func handleMoveArrowClick() {
+	aabbx, aabby, aabbz := arrows.getMoveAABBs()
+	posx, sizex := getRectForAABB(aabbx)
+	posy, sizey := getRectForAABB(aabby)
+	posz, sizez := getRectForAABB(aabbz)
+	mpos := gohome.InputMgr.Mouse.ToScreenPosition()
+
+	if intersects(mpos, posx, sizex) {
+		log.Println("Click X")
+	} else if intersects(mpos, posy, sizey) {
+		log.Println("Click Y")
+	} else if intersects(mpos, posz, sizez) {
+		log.Println("Click Z")
+	}
 }

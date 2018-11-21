@@ -11,7 +11,6 @@ import (
 )
 
 type EditScene struct {
-	gohome.NilRenderObject
 }
 
 func (this *EditScene) InitGUI() {
@@ -49,7 +48,6 @@ func (this *EditScene) InitGraphics() {
 	gohome.RenderMgr.SetCamera3D(&camera, 0)
 	updateResolution(gtk.GetGLArea().ToWidget())
 
-	var arrows Arrows
 	var cameraUpdater CameraUpdater
 	cameraUpdater.Init()
 	arrows.Init()
@@ -92,8 +90,6 @@ func (this *EditScene) InitTest() {
 			"Sword.obj", string(swordc), "files/Sword.obj",
 		},
 	}...)
-
-	gohome.RenderMgr.AddObject(this)
 }
 
 func (this *EditScene) Init() {
@@ -111,11 +107,6 @@ func (this *EditScene) Update(delta_time float32) {
 		}
 	}
 
-}
-
-func (this *EditScene) Render() {
-	ray := gohome.InputMgr.Mouse.ToRay()
-	gohome.DrawLine3D(camera_center, camera.Position.Add(ray))
 }
 
 func (this *EditScene) Terminate() {

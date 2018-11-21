@@ -25,3 +25,4 @@ var selected_model uint32
 var current_mode Mode = MODE_PLACE
 
 var placing_object PlacingObject
+var arrows Arrows
