@@ -196,29 +196,6 @@ func (this *Arrows) SetParent(parent interface{}) {
 	this.rotateZ.SetParent(parent)*/
 }
 
-func transformAABB(aabb *gohome.AxisAlignedBoundingBox, transform *gohome.TransformableObject3D, wg *sync.WaitGroup) {
-	tmat := transform.GetTransformMatrix()
-	vmat := camera.GetViewMatrix()
-	pmat := gohome.RenderMgr.Projection3D.GetProjectionMatrix()
-	mat := pmat.Mul4(vmat).Mul4(tmat)
-	min4 := mat.Mul4x1(aabb.Min.Vec4(1))
-	max4 := mat.Mul4x1(aabb.Max.Vec4(1))
-	min3 := min4.Div(min4.W()).Vec3()
-	max3 := max4.Div(max4.W()).Vec3()
-	aabb.Min = min3.Div(min3.Z())
-	aabb.Max = max3.Div(max3.Z())
-	nres := gohome.Render.GetNativeResolution()
-
-	min, max := aabb.Min.Vec2(), aabb.Max.Vec2()
-	min = min.MulVec([2]float32{1.0, -1.0}).Add([2]float32{1.0, 1.0}).DivVec([2]float32{2.0, 2.0}).MulVec(nres)
-	max = max.MulVec([2]float32{1.0, -1.0}).Add([2]float32{1.0, 1.0}).DivVec([2]float32{2.0, 2.0}).MulVec(nres)
-
-	aabb.Min = min.Vec3(-1.0)
-	aabb.Max = max.Vec3(-1.0)
-
-	wg.Done()
-}
-
 func (this *Arrows) calculateAllMatrices() {
 	var wg sync.WaitGroup
 
@@ -246,22 +223,7 @@ func (this *Arrows) calculateAllMatrices() {
 	wg.Wait()
 }
 
-func (this *Arrows) getMoveAABBs() (gohome.AxisAlignedBoundingBox, gohome.AxisAlignedBoundingBox, gohome.AxisAlignedBoundingBox) {
-	aabbx := this.translateX.Model3D.AABB
-	aabby := this.translateY.Model3D.AABB
-	aabbz := this.translateZ.Model3D.AABB
-
-	this.calculateAllMatrices()
-	var wg sync.WaitGroup
-	wg.Add(3)
-	go transformAABB(&aabbx, this.translateX.Transform, &wg)
-	go transformAABB(&aabby, this.translateY.Transform, &wg)
-	go transformAABB(&aabbz, this.translateZ.Transform, &wg)
-	wg.Wait()
-	return aabbx, aabby, aabbz
-}
-
-func convert3Dto2D(pos mgl32.Vec3) mgl32.Vec2 {
+func convert3Dto2D(pos mgl32.Vec3, pos2 *mgl32.Vec2, wg *sync.WaitGroup) {
 	vmat := camera.GetViewMatrix()
 	pmat := gohome.RenderMgr.Projection3D.GetProjectionMatrix()
 	mat := pmat.Mul4(vmat)
@@ -270,9 +232,40 @@ func convert3Dto2D(pos mgl32.Vec3) mgl32.Vec2 {
 	pos3 = pos3.Div(pos3.Z())
 	nres := gohome.Render.GetNativeResolution()
 
-	pos2 := pos3.Vec2()
-	pos2 = pos2.MulVec([2]float32{1.0, -1.0}).Add([2]float32{1.0, 1.0}).DivVec([2]float32{2.0, 2.0}).MulVec(nres)
-	return pos2
+	*pos2 = pos3.Vec2()
+	*pos2 = pos2.MulVec([2]float32{1.0, -1.0}).Add([2]float32{1.0, 1.0}).DivVec([2]float32{2.0, 2.0}).MulVec(nres)
+	wg.Done()
+}
+
+func calculateRectangle(pos, dir mgl32.Vec2, points *[4]mgl32.Vec2, wg *sync.WaitGroup) {
+	point := dir.Sub(pos)
+	point = mgl32.Rotate2D(mgl32.DegToRad(90.0)).Mul2x1(point).Normalize().Mul(ARROW_WIDTH / 2.0)
+
+	min := pos.Add(point)
+	max := dir.Add(point.Mul(-1))
+
+	(*points)[0] = min
+	(*points)[1] = min.Add(point.Mul(-2))
+	(*points)[2] = max
+	(*points)[3] = max.Add(point.Mul(2))
+	wg.Done()
+}
+
+func calculateRectangles(pos, xdir, ydir, zdir mgl32.Vec2) (pointsx, pointsy, pointsz [4]mgl32.Vec2) {
+	var wg sync.WaitGroup
+	wg.Add(3)
+	go calculateRectangle(pos, xdir, &pointsx, &wg)
+	go calculateRectangle(pos, ydir, &pointsy, &wg)
+	go calculateRectangle(pos, zdir, &pointsz, &wg)
+	wg.Wait()
+	return
+}
+
+func (this *Arrows) GetMoveHitboxes() (pointsx, pointsy, pointsz [4]mgl32.Vec2) {
+	this.calculateAllMatrices()
+	pos, xdir, ydir, zdir := this.getMovePosAndDirections()
+	pointsx, pointsy, pointsz = calculateRectangles(pos, xdir, ydir, zdir)
+	return
 }
 
 func (this *Arrows) getMovePosAndDirections() (pos, xdir, ydir, zdir mgl32.Vec2) {
@@ -283,11 +276,13 @@ func (this *Arrows) getMovePosAndDirections() (pos, xdir, ydir, zdir mgl32.Vec2)
 	ypos := this.translateY.Transform.Position
 	zpos := this.translateZ.Transform.Position
 	scale := this.translateX.Transform.Scale[0]
-
-	pos = convert3Dto2D(xpos)
-	xdir = convert3Dto2D(xpos.Add(x.Mul(2.5 * scale)))
-	ydir = convert3Dto2D(ypos.Add(y.Mul(2.5 * scale)))
-	zdir = convert3Dto2D(zpos.Add(z.Mul(2.5 * scale)))
+	var wg sync.WaitGroup
+	wg.Add(4)
+	go convert3Dto2D(xpos, &pos, &wg)
+	go convert3Dto2D(xpos.Add(x.Mul(ARROW_LENGTH*scale)), &xdir, &wg)
+	go convert3Dto2D(ypos.Add(y.Mul(ARROW_LENGTH*scale)), &ydir, &wg)
+	go convert3Dto2D(zpos.Add(z.Mul(ARROW_LENGTH*scale)), &zdir, &wg)
+	wg.Wait()
 	return
 }
 

@@ -5,7 +5,6 @@ import (
 	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK/gtk"
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
 	"github.com/PucklaMotzer09/mathgl/mgl32"
-	"log"
 )
 
 func uint32ToString(i uint32) string {
@@ -212,73 +211,10 @@ func updateCameraPanning() {
 	camera_center = camera.Position.Add(camera.LookDirection.Mul(camera_zoom))
 }
 
-func getRectForAABB(aabb gohome.AxisAlignedBoundingBox) (pos mgl32.Vec2, size mgl32.Vec2) {
-	max, min := aabb.Max.Vec2(), aabb.Min.Vec2()
-	maxreal := max
-	minreal := min
-
-	if min.X() > maxreal.X() {
-		maxreal[0] = min.X()
-	}
-	if min.Y() > maxreal.Y() {
-		maxreal[1] = min.Y()
-	}
-	if max.X() < minreal.X() {
-		minreal[0] = max.X()
-	}
-	if max.Y() < minreal.Y() {
-		minreal[1] = max.Y()
-	}
-
-	pos = minreal
-	size = maxreal.Sub(minreal)
-	return
-}
-
-func intersects(mpos, pos, size mgl32.Vec2) bool {
-	return mpos[0] > pos[0] && mpos[0] < pos[0]+size[0] &&
-		mpos[1] > pos[1] && mpos[1] < pos[1]+size[1]
-}
-
-func calculateRectangle(pos, dir mgl32.Vec2) (points [4]mgl32.Vec2) {
-	point := dir.Sub(pos)
-	point = mgl32.Rotate2D(mgl32.DegToRad(90.0)).Mul2x1(point).Normalize().Mul(10)
-
-	min := pos.Add(point)
-	max := dir.Add(point.Mul(-1))
-
-	points[0] = min
-	points[1] = min.Add(point.Mul(-2))
-	points[2] = max
-	points[3] = max.Add(point.Mul(2))
-	return
-}
-
-func calculateRectangles(pos, xdir, ydir, zdir mgl32.Vec2) (pointsx, pointsy, pointsz [4]mgl32.Vec2) {
-	pointsx = calculateRectangle(pos, xdir)
-	pointsy = calculateRectangle(pos, ydir)
-	pointsz = calculateRectangle(pos, zdir)
-	return
-}
-
 func handleMoveArrowClick() {
-	aabbx, aabby, aabbz := arrows.getMoveAABBs()
-	posx, sizex := getRectForAABB(aabbx)
-	posy, sizey := getRectForAABB(aabby)
-	posz, sizez := getRectForAABB(aabbz)
-	mpos := gohome.InputMgr.Mouse.ToScreenPosition()
-	pos, xdir, ydir, zdir := arrows.getMovePosAndDirections()
-	pointsx, pointsy, pointsz := calculateRectangles(pos, xdir, ydir, zdir)
+	pointsx, pointsy, pointsz := arrows.GetMoveHitboxes()
 
 	arrows.points[0] = pointsx
 	arrows.points[1] = pointsy
 	arrows.points[2] = pointsz
-
-	if intersects(mpos, posx, sizex) {
-		log.Println("Click X")
-	} else if intersects(mpos, posy, sizey) {
-		log.Println("Click Y")
-	} else if intersects(mpos, posz, sizez) {
-		log.Println("Click Z")
-	}
 }

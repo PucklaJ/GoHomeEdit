@@ -13,6 +13,9 @@ const (
 	NUM_SMOOTH_DELTAS int = 5
 	NUM_SMOOTH_ZOOM   int = 10
 	NUM_SMOOTH_PAN    int = 5
+
+	ARROW_LENGTH float32 = 2.3
+	ARROW_WIDTH  float32 = 6.0
 )
 
 // PlacingObject Shader
