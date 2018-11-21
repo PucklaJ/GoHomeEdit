@@ -12,6 +12,7 @@ const (
 )
 
 type Arrows struct {
+	gohome.NilRenderObject
 	translateX gohome.Entity3D
 	translateY gohome.Entity3D
 	translateZ gohome.Entity3D
@@ -23,6 +24,8 @@ type Arrows struct {
 	rotateX gohome.Entity3D
 	rotateY gohome.Entity3D
 	rotateZ gohome.Entity3D
+
+	points [3][4]mgl32.Vec2
 }
 
 func (this *Arrows) Init() {
@@ -113,6 +116,7 @@ func (this *Arrows) Init() {
 	gohome.RenderMgr.AddObject(&this.rotateY)
 	gohome.RenderMgr.AddObject(&this.rotateZ)*/
 	gohome.UpdateMgr.AddObject(this)
+	gohome.RenderMgr.AddObject(this)
 }
 
 var rotate float32 = 0.0
@@ -215,10 +219,7 @@ func transformAABB(aabb *gohome.AxisAlignedBoundingBox, transform *gohome.Transf
 	wg.Done()
 }
 
-func (this *Arrows) getMoveAABBs() (gohome.AxisAlignedBoundingBox, gohome.AxisAlignedBoundingBox, gohome.AxisAlignedBoundingBox) {
-	aabbx := this.translateX.Model3D.AABB
-	aabby := this.translateY.Model3D.AABB
-	aabbz := this.translateZ.Model3D.AABB
+func (this *Arrows) calculateAllMatrices() {
 	var wg sync.WaitGroup
 
 	wg.Add(5)
@@ -243,11 +244,70 @@ func (this *Arrows) getMoveAABBs() (gohome.AxisAlignedBoundingBox, gohome.AxisAl
 		wg.Done()
 	}()
 	wg.Wait()
+}
 
+func (this *Arrows) getMoveAABBs() (gohome.AxisAlignedBoundingBox, gohome.AxisAlignedBoundingBox, gohome.AxisAlignedBoundingBox) {
+	aabbx := this.translateX.Model3D.AABB
+	aabby := this.translateY.Model3D.AABB
+	aabbz := this.translateZ.Model3D.AABB
+
+	this.calculateAllMatrices()
+	var wg sync.WaitGroup
 	wg.Add(3)
 	go transformAABB(&aabbx, this.translateX.Transform, &wg)
 	go transformAABB(&aabby, this.translateY.Transform, &wg)
 	go transformAABB(&aabbz, this.translateZ.Transform, &wg)
 	wg.Wait()
 	return aabbx, aabby, aabbz
+}
+
+func convert3Dto2D(pos mgl32.Vec3) mgl32.Vec2 {
+	vmat := camera.GetViewMatrix()
+	pmat := gohome.RenderMgr.Projection3D.GetProjectionMatrix()
+	mat := pmat.Mul4(vmat)
+	pos4 := mat.Mul4x1(pos.Vec4(1))
+	pos3 := pos4.Div(pos4.W()).Vec3()
+	pos3 = pos3.Div(pos3.Z())
+	nres := gohome.Render.GetNativeResolution()
+
+	pos2 := pos3.Vec2()
+	pos2 = pos2.MulVec([2]float32{1.0, -1.0}).Add([2]float32{1.0, 1.0}).DivVec([2]float32{2.0, 2.0}).MulVec(nres)
+	return pos2
+}
+
+func (this *Arrows) getMovePosAndDirections() (pos, xdir, ydir, zdir mgl32.Vec2) {
+	x := mgl32.Vec3{1.0, 0.0, 0.0}
+	y := mgl32.Vec3{0.0, 1.0, 0.0}
+	z := mgl32.Vec3{0.0, 0.0, 1.0}
+	xpos := this.translateX.Transform.Position
+	ypos := this.translateY.Transform.Position
+	zpos := this.translateZ.Transform.Position
+	scale := this.translateX.Transform.Scale[0]
+
+	pos = convert3Dto2D(xpos)
+	xdir = convert3Dto2D(xpos.Add(x.Mul(2.5 * scale)))
+	ydir = convert3Dto2D(ypos.Add(y.Mul(2.5 * scale)))
+	zdir = convert3Dto2D(zpos.Add(z.Mul(2.5 * scale)))
+	return
+}
+
+func (this *Arrows) Render() {
+	gohome.Filled = false
+	for i := 0; i < 3; i++ {
+		switch i {
+		case 0:
+			gohome.DrawColor = colornames.Red
+		case 1:
+			gohome.DrawColor = colornames.Green
+		case 2:
+			gohome.DrawColor = colornames.Blue
+		}
+		gohome.DrawRectangle2D(
+			this.points[i][0],
+			this.points[i][1],
+			this.points[i][2],
+			this.points[i][3],
+		)
+	}
+
 }

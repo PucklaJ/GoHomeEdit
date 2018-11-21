@@ -106,7 +106,7 @@ func (this *EditScene) Update(delta_time float32) {
 			onLeftClick()
 		}
 	}
-
+	handleMoveArrowClick()
 }
 
 func (this *EditScene) Terminate() {

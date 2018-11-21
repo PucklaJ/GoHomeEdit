@@ -240,12 +240,39 @@ func intersects(mpos, pos, size mgl32.Vec2) bool {
 		mpos[1] > pos[1] && mpos[1] < pos[1]+size[1]
 }
 
+func calculateRectangle(pos, dir mgl32.Vec2) (points [4]mgl32.Vec2) {
+	point := dir.Sub(pos)
+	point = mgl32.Rotate2D(mgl32.DegToRad(90.0)).Mul2x1(point).Normalize().Mul(10)
+
+	min := pos.Add(point)
+	max := dir.Add(point.Mul(-1))
+
+	points[0] = min
+	points[1] = min.Add(point.Mul(-2))
+	points[2] = max
+	points[3] = max.Add(point.Mul(2))
+	return
+}
+
+func calculateRectangles(pos, xdir, ydir, zdir mgl32.Vec2) (pointsx, pointsy, pointsz [4]mgl32.Vec2) {
+	pointsx = calculateRectangle(pos, xdir)
+	pointsy = calculateRectangle(pos, ydir)
+	pointsz = calculateRectangle(pos, zdir)
+	return
+}
+
 func handleMoveArrowClick() {
 	aabbx, aabby, aabbz := arrows.getMoveAABBs()
 	posx, sizex := getRectForAABB(aabbx)
 	posy, sizey := getRectForAABB(aabby)
 	posz, sizez := getRectForAABB(aabbz)
 	mpos := gohome.InputMgr.Mouse.ToScreenPosition()
+	pos, xdir, ydir, zdir := arrows.getMovePosAndDirections()
+	pointsx, pointsy, pointsz := calculateRectangles(pos, xdir, ydir, zdir)
+
+	arrows.points[0] = pointsx
+	arrows.points[1] = pointsy
+	arrows.points[2] = pointsz
 
 	if intersects(mpos, posx, sizex) {
 		log.Println("Click X")

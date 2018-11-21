@@ -88,6 +88,5 @@ func onLeftClick() {
 			pm.PlacedObject.Transform.Position = camera_center
 		}
 	} else if current_mode == MODE_MOVE {
-		handleMoveArrowClick()
 	}
 }
