@@ -5,6 +5,7 @@ import (
 	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK/gtk"
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
 	"github.com/PucklaMotzer09/mathgl/mgl32"
+	"log"
 )
 
 func uint32ToString(i uint32) string {
@@ -220,4 +221,15 @@ func handleMoveArrowClick() {
 	arrows.points[0] = pointsx
 	arrows.points[1] = pointsy
 	arrows.points[2] = pointsz
+
+	mpos := gohome.InputMgr.Mouse.ToScreenPosition()
+	quadx, quady, quadz := gohome.QuadMath2D(pointsx), gohome.QuadMath2D(pointsy), gohome.QuadMath2D(pointsz)
+
+	if quadx.IntersectsPoint(mpos) {
+		log.Println("Click X")
+	} else if quady.IntersectsPoint(mpos) {
+		log.Println("Click Y")
+	} else if quadz.IntersectsPoint(mpos) {
+		log.Println("Click Z")
+	}
 }
