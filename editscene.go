@@ -106,8 +106,10 @@ func (this *EditScene) Update(delta_time float32) {
 		if !lb_assets.ToWidget().HasFocus() {
 			onLeftClick()
 		}
+	} else if gohome.InputMgr.WasPressed(gohome.MouseButtonLeft) && !gohome.InputMgr.IsPressed(gohome.MouseButtonLeft) {
+		onLeftClickRelease()
 	}
-	handleMoveArrowClick()
+	handleTransforming()
 }
 
 func (this *EditScene) Terminate() {

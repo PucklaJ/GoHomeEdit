@@ -26,3 +26,9 @@ var current_mode Mode = MODE_PLACE
 
 var placing_object PlacingObject
 var arrows Arrows
+
+var transform_start mgl32.Vec2
+var transform_end mgl32.Vec2
+var is_transforming = false
+
+var transform_start_pos mgl32.Vec3

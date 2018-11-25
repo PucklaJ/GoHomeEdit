@@ -5,7 +5,6 @@ import (
 	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK/gtk"
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
 	"github.com/PucklaMotzer09/mathgl/mgl32"
-	"log"
 )
 
 func uint32ToString(i uint32) string {
@@ -105,7 +104,9 @@ func resetSmoothDeltas() {
 }
 
 func updateCameraRotation() {
-
+	if is_transforming {
+		return
+	}
 	dx, dy := float32(gohome.InputMgr.Mouse.DPos[0]), float32(gohome.InputMgr.Mouse.DPos[1])
 	if !gohome.InputMgr.IsPressed(gohome.MouseButtonRight) {
 		dx, dy = 0.0, 0.0
@@ -160,6 +161,10 @@ func smoothZooms() float32 {
 }
 
 func updateCameraZoom() {
+	if is_transforming {
+		return
+	}
+
 	wy := float32(gohome.InputMgr.Mouse.Wheel[1])
 	zoom := wy * CAM_ZOOM_VELOCITY
 	smooth_zooms[current_smooth_zoom] = zoom
@@ -186,6 +191,9 @@ func smoothPans() (float32, float32) {
 }
 
 func updateCameraPanning() {
+	if is_transforming {
+		return
+	}
 
 	dx, dy := float32(gohome.InputMgr.Mouse.DPos[0]), float32(gohome.InputMgr.Mouse.DPos[1])
 	if !gohome.InputMgr.IsPressed(gohome.MouseButtonMiddle) {
@@ -218,18 +226,49 @@ func updateCameraPanning() {
 func handleMoveArrowClick() {
 	pointsx, pointsy, pointsz := arrows.GetMoveHitboxes()
 
-	arrows.points[0] = pointsx
-	arrows.points[1] = pointsy
-	arrows.points[2] = pointsz
-
 	mpos := gohome.InputMgr.Mouse.ToScreenPosition()
 	quadx, quady, quadz := gohome.QuadMath2D(pointsx), gohome.QuadMath2D(pointsy), gohome.QuadMath2D(pointsz)
 
 	if quadx.IntersectsPoint(mpos) {
-		log.Println("Click X")
+		transform_start = mpos
+		arrows.IsTransforming = X_AXIS
+		is_transforming = true
 	} else if quady.IntersectsPoint(mpos) {
-		log.Println("Click Y")
+		transform_start = mpos
+		arrows.IsTransforming = Y_AXIS
+		is_transforming = true
 	} else if quadz.IntersectsPoint(mpos) {
-		log.Println("Click Z")
+		transform_start = mpos
+		arrows.IsTransforming = Z_AXIS
+		is_transforming = true
+	}
+
+	if m, ok := placed_models[place_id-1]; ok {
+		transform_start_pos = m.Entity3D.Transform.GetPosition()
+	}
+}
+
+func handleTransforming() {
+	if !is_transforming {
+		return
+	}
+
+	mpos := gohome.InputMgr.Mouse.ToScreenPosition()
+	transform_end = mpos
+
+	proj_end := transform_end.Project(arrows.points[0], arrows.points[1])
+	len1 := proj_end.Sub(arrows.points[0]).Len()
+	len2 := arrows.points[1].Sub(arrows.points[0]).Len()
+	transform_amount := len1 / len2
+	dir := arrows.points[1].Sub(arrows.points[0]).Normalize()
+	dir1 := proj_end.Sub(arrows.points[0]).Normalize()
+	if !dir.ApproxEqualThreshold(dir1, 0.1) {
+		transform_amount *= -1.0
+	}
+
+	if current_mode == MODE_MOVE {
+		if m, ok := placed_models[place_id-1]; ok {
+			m.Entity3D.Transform.Position = arrows.points3D[0].Add(arrows.points3D[1].Sub(arrows.points3D[0]).Mul(transform_amount))
+		}
 	}
 }
