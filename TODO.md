@@ -1,5 +1,5 @@
 + Transform Assets
-    - Move, Rotate, Scale
+    - Rotate, Scale
 + Arrow drawing
     - For rotate
     - draw 3D model

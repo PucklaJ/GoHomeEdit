@@ -5,6 +5,7 @@ import (
 	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK/gtk"
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
 	"github.com/PucklaMotzer09/mathgl/mgl32"
+	"math"
 )
 
 func uint32ToString(i uint32) string {
@@ -224,51 +225,96 @@ func updateCameraPanning() {
 }
 
 func handleMoveArrowClick() {
+	var m *PlacedModel
+	var ok bool
+	if m, ok = placed_models[place_id-1]; ok {
+		transform_start_pos = m.Entity3D.Transform.GetPosition()
+	} else {
+		return
+	}
+
 	pointsx, pointsy, pointsz := arrows.GetMoveHitboxes()
 
 	mpos := gohome.InputMgr.Mouse.ToScreenPosition()
 	quadx, quady, quadz := gohome.QuadMath2D(pointsx), gohome.QuadMath2D(pointsy), gohome.QuadMath2D(pointsz)
 
 	if quadx.IntersectsPoint(mpos) {
-		transform_start = mpos
 		arrows.IsTransforming = X_AXIS
 		is_transforming = true
+		arrows.CalculatePoints()
+		transform_start = getAxisProjectedPos(mpos, X_AXIS, m)
 	} else if quady.IntersectsPoint(mpos) {
-		transform_start = mpos
 		arrows.IsTransforming = Y_AXIS
 		is_transforming = true
+		arrows.CalculatePoints()
+		transform_start = getAxisProjectedPos(mpos, Y_AXIS, m)
 	} else if quadz.IntersectsPoint(mpos) {
-		transform_start = mpos
 		arrows.IsTransforming = Z_AXIS
 		is_transforming = true
+		arrows.CalculatePoints()
+		transform_start = getAxisProjectedPos(mpos, Z_AXIS, m)
+	}
+}
+
+func getAxisProjectedPos(screenPos mgl32.Vec2, axis uint8, m *PlacedModel) mgl32.Vec3 {
+	var plane gohome.PlaneMath3D
+
+	switch axis {
+	case X_AXIS:
+		plane = getBestPlane(X_PLANES)
+	case Y_AXIS:
+		plane = getBestPlane(Y_PLANES)
+	case Z_AXIS:
+		plane = getBestPlane(Z_PLANES)
 	}
 
-	if m, ok := placed_models[place_id-1]; ok {
-		transform_start_pos = m.Entity3D.Transform.GetPosition()
-	}
+	changePlanePoint(&plane, m.Entity3D.Transform.Position)
+
+	mray := gohome.ScreenPositionToRay(screenPos)
+	planePos := mray.PlaneIntersect(camera.Position, plane.Normal, plane.Point)
+	planePos = planePos.Project(arrows.points3D[0], arrows.points3D[1])
+
+	return planePos
 }
 
 func handleTransforming() {
 	if !is_transforming {
 		return
 	}
-
-	mpos := gohome.InputMgr.Mouse.ToScreenPosition()
-	transform_end = mpos
-
-	proj_end := transform_end.Project(arrows.points[0], arrows.points[1])
-	len1 := proj_end.Sub(arrows.points[0]).Len()
-	len2 := arrows.points[1].Sub(arrows.points[0]).Len()
-	transform_amount := len1 / len2
-	dir := arrows.points[1].Sub(arrows.points[0]).Normalize()
-	dir1 := proj_end.Sub(arrows.points[0]).Normalize()
-	if !dir.ApproxEqualThreshold(dir1, 0.1) {
-		transform_amount *= -1.0
+	m, ok := placed_models[place_id-1]
+	if !ok {
+		return
 	}
 
+	arrows.SetPosition()
+
+	planePos := getAxisProjectedPos(gohome.InputMgr.Mouse.ToScreenPosition(), arrows.IsTransforming, m)
 	if current_mode == MODE_MOVE {
-		if m, ok := placed_models[place_id-1]; ok {
-			m.Entity3D.Transform.Position = arrows.points3D[0].Add(arrows.points3D[1].Sub(arrows.points3D[0]).Mul(transform_amount))
+		m.Entity3D.Transform.Position = planePos.Sub(transform_start).Add(transform_start_pos)
+	}
+}
+
+func getBestPlane(planes [4]gohome.PlaneMath3D) gohome.PlaneMath3D {
+	minDot := float32(math.Acos(float64(planes[0].Normal.Dot(camera.LookDirection))))
+	minIndex := 0
+
+	for i := 1; i < 4; i++ {
+		dot := float32(math.Acos(float64(planes[i].Normal.Dot(camera.LookDirection))))
+		if dot < minDot {
+			minDot = dot
+			minIndex = i
 		}
+	}
+
+	return planes[minIndex]
+}
+
+func changePlanePoint(plane *gohome.PlaneMath3D, position mgl32.Vec3) {
+	if plane.Normal.X() != 0.0 {
+		plane.Point[0] = position.X()
+	} else if plane.Normal.Y() != 0.0 {
+		plane.Point[1] = position.Y()
+	} else {
+		plane.Point[2] = position.Z()
 	}
 }

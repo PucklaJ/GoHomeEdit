@@ -95,4 +95,6 @@ func onLeftClick() {
 func onLeftClickRelease() {
 	is_transforming = false
 	arrows.IsTransforming = 0
+	arrows.ResetPosition()
+	arrows.SetScale()
 }

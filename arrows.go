@@ -15,6 +15,65 @@ const (
 	Z_AXIS uint8 = 3
 )
 
+var (
+	X_PLANES = [4]gohome.PlaneMath3D{
+		{
+			mgl32.Vec3{0.0, 0.0, 1.0},
+			mgl32.Vec3{1.0, 1.0, 0.0},
+		},
+		{
+			mgl32.Vec3{0.0, 0.0, -1.0},
+			mgl32.Vec3{1.0, 1.0, 0.0},
+		},
+		{
+			mgl32.Vec3{0.0, 1.0, 0.0},
+			mgl32.Vec3{1.0, 0.0, 1.0},
+		},
+		{
+			mgl32.Vec3{0.0, -1.0, 0.0},
+			mgl32.Vec3{1.0, 0.0, 1.0},
+		},
+	}
+
+	Y_PLANES = [4]gohome.PlaneMath3D{
+		{
+			mgl32.Vec3{0.0, 0.0, 1.0},
+			mgl32.Vec3{1.0, 1.0, 0.0},
+		},
+		{
+			mgl32.Vec3{0.0, 0.0, -1.0},
+			mgl32.Vec3{1.0, 1.0, 0.0},
+		},
+		{
+			mgl32.Vec3{1.0, 0.0, 0.0},
+			mgl32.Vec3{0.0, 1.0, 1.0},
+		},
+		{
+			mgl32.Vec3{-1.0, 0.0, 0.0},
+			mgl32.Vec3{0.0, 1.0, 1.0},
+		},
+	}
+
+	Z_PLANES = [4]gohome.PlaneMath3D{
+		{
+			mgl32.Vec3{0.0, 1.0, 0.0},
+			mgl32.Vec3{1.0, 0.0, 1.0},
+		},
+		{
+			mgl32.Vec3{0.0, -1.0, 0.0},
+			mgl32.Vec3{1.0, 0.0, 1.0},
+		},
+		{
+			mgl32.Vec3{1.0, 0.0, 0.0},
+			mgl32.Vec3{0.0, 1.0, 1.0},
+		},
+		{
+			mgl32.Vec3{-1.0, 0.0, 0.0},
+			mgl32.Vec3{0.0, 1.0, 1.0},
+		},
+	}
+)
+
 type Arrows struct {
 	gohome.NilRenderObject
 	translateX gohome.Entity3D
@@ -42,9 +101,9 @@ func (this *Arrows) Init() {
 	this.translateY.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Arrow_Cone").Copy())
 	this.translateZ.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Arrow_Cone").Copy())
 
-	this.scaleX.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Block_Cube"))
-	this.scaleY.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Block_Cube").Copy())
-	this.scaleZ.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Block_Cube").Copy())
+	this.scaleX.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Block_Cube.001"))
+	this.scaleY.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Block_Cube.001").Copy())
+	this.scaleZ.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Block_Cube.001").Copy())
 
 	/*this.rotateX.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Block_Cube"))
 	this.rotateY.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Block_Cube").Copy())
@@ -132,9 +191,7 @@ func (this *Arrows) Init() {
 	this.points3D[1] = [3]float32{2.0, 2.0, 2.0}
 }
 
-var rotate float32 = 0.0
-
-func (this *Arrows) Update(detla_time float32) {
+func (this *Arrows) SetScale() {
 	cam := camera.Position
 	if current_mode == MODE_MOVE {
 		txs := this.translateX.Transform.GetPosition().Sub(cam).Len() * ARROWS_SIZE
@@ -190,6 +247,10 @@ func (this *Arrows) Update(detla_time float32) {
 		this.rotateZ.Visible = false
 	}*/
 
+}
+
+func (this *Arrows) Update(detla_time float32) {
+	this.SetScale()
 	if !is_transforming && len(placed_models) != 0 {
 		this.SetParent(&placed_models[place_id-1].Entity3D)
 	} else {
@@ -258,7 +319,6 @@ func convert3Dto2D(pos mgl32.Vec3, pos2 *mgl32.Vec2, wg *sync.WaitGroup) {
 	mat := pmat.Mul4(vmat)
 	pos4 := mat.Mul4x1(pos.Vec4(1))
 	pos3 := pos4.Div(pos4.W()).Vec3()
-	pos3 = pos3.Div(pos3.Z())
 	nres := gohome.Render.GetNativeResolution()
 
 	*pos2 = pos3.Vec2()
@@ -281,6 +341,7 @@ func calculateRectangle(pos, dir mgl32.Vec2, points *[4]mgl32.Vec2, wg *sync.Wai
 }
 
 func calculateRectangles(pos, xdir, ydir, zdir mgl32.Vec2) (pointsx, pointsy, pointsz [4]mgl32.Vec2) {
+
 	var wg sync.WaitGroup
 	wg.Add(3)
 	go calculateRectangle(pos, xdir, &pointsx, &wg)
@@ -301,9 +362,9 @@ func (this *Arrows) getMovePosAndDirections() (pos, xdir, ydir, zdir mgl32.Vec2)
 	x := mgl32.Vec3{1.0, 0.0, 0.0}
 	y := mgl32.Vec3{0.0, 1.0, 0.0}
 	z := mgl32.Vec3{0.0, 0.0, 1.0}
-	xpos := this.translateX.Transform.GetTransformMatrix().Mul4x1([4]float32{0.0, 0.0, 0.0, 1.0}).Vec3()
-	ypos := xpos
-	zpos := xpos
+	xpos := this.translateX.Transform.GetPosition()
+	ypos := this.translateY.Transform.GetPosition()
+	zpos := this.translateZ.Transform.GetPosition()
 	scale := this.translateX.Transform.Scale[0]
 	var wg sync.WaitGroup
 	wg.Add(4)
@@ -315,7 +376,78 @@ func (this *Arrows) getMovePosAndDirections() (pos, xdir, ydir, zdir mgl32.Vec2)
 	return
 }
 
+func (this *Arrows) SetPosition() {
+	this.translateX.Transform.Position = transform_start_pos
+	this.translateY.Transform.Position = transform_start_pos
+	this.translateZ.Transform.Position = transform_start_pos
+
+	this.scaleX.Transform.Position = transform_start_pos
+	this.scaleY.Transform.Position = transform_start_pos
+	this.scaleZ.Transform.Position = transform_start_pos
+
+	/*this.rotateX.Transform.Position = transform_start_pos
+	this.rotateY.Transform.Position = transform_start_pos
+	this.rotateZ.Transform.Position = transform_start_pos*/
+}
+
+func (this *Arrows) ResetPosition() {
+	if m, ok := placed_models[place_id-1]; ok {
+		this.SetParent(&m.Entity3D)
+	}
+}
+
+func (this *Arrows) CalculatePoints() {
+	var point1, point2 mgl32.Vec3
+	var point12D, point22D mgl32.Vec2
+
+	switch this.IsTransforming {
+	case X_AXIS:
+		point1 = this.translateX.Transform.GetPosition()
+		point2 = point1.Add(mgl32.Vec3{1.0, 0.0, 0.0}.Mul(ARROW_LENGTH))
+		gohome.DrawColor = colornames.Red
+	case Y_AXIS:
+		point1 = this.translateY.Transform.GetPosition()
+		point2 = point1.Add(mgl32.Vec3{0.0, 1.0, 0.0}.Mul(ARROW_LENGTH))
+		gohome.DrawColor = colornames.Lime
+	case Z_AXIS:
+		point1 = this.translateZ.Transform.GetPosition()
+		point2 = point1.Add(mgl32.Vec3{0.0, 0.0, 1.0}.Mul(ARROW_LENGTH))
+		gohome.DrawColor = colornames.Mediumblue
+	}
+
+	mid := point1.Add(point2.Sub(point1).Mul(0.5))
+	left := point1.Sub(mid).Normalize()
+	right := point2.Sub(mid).Normalize()
+
+	point1 = mid.Add(left.Mul(ARROW_LINE_LENGTH / 2.0))
+	point2 = mid.Add(right.Mul(ARROW_LINE_LENGTH / 2.0))
+	this.points3D[0] = point1
+	this.points3D[1] = point2
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go convert3Dto2D(point1, &point12D, &wg)
+	wg.Wait()
+	wg.Add(1)
+	go convert3Dto2D(point2, &point22D, &wg)
+	wg.Wait()
+	this.points[0] = point12D
+	this.points[1] = point22D
+}
+
+func (this *Arrows) drawHitboxes() {
+	pointsx, pointsy, pointsz := this.GetMoveHitboxes()
+
+	gohome.Filled = false
+	gohome.DrawColor = colornames.Red
+	gohome.DrawRectangle2D(pointsx[0], pointsx[1], pointsx[2], pointsx[3])
+	gohome.DrawColor = colornames.Lime
+	gohome.DrawRectangle2D(pointsy[0], pointsy[1], pointsy[2], pointsy[3])
+	gohome.DrawColor = colornames.Mediumblue
+	gohome.DrawRectangle2D(pointsz[0], pointsz[1], pointsz[2], pointsz[3])
+}
+
 func (this *Arrows) Render() {
+
 	if this.IsTransforming != 0 {
 		this.translateX.Visible = false
 		this.translateY.Visible = false
@@ -329,54 +461,15 @@ func (this *Arrows) Render() {
 		this.rotateY.Visible = false
 		this.rotateZ.Visible = false
 
-		this.translateX.Transform.Position = transform_start_pos
-		this.translateY.Transform.Position = transform_start_pos
-		this.translateZ.Transform.Position = transform_start_pos
-
-		this.scaleX.Transform.Position = transform_start_pos
-		this.scaleY.Transform.Position = transform_start_pos
-		this.scaleZ.Transform.Position = transform_start_pos
-
-		/*this.rotateX.Transform.Position = transform_start_pos
-		this.rotateY.Transform.Position = transform_start_pos
-		this.rotateZ.Transform.Position = transform_start_pos*/
-
-		var point1, point2 mgl32.Vec3
-		var point12D, point22D mgl32.Vec2
-
 		switch this.IsTransforming {
 		case X_AXIS:
-			point1 = this.translateX.Transform.GetPosition()
-			point2 = point1.Add(mgl32.Vec3{1.0, 0.0, 0.0}.Mul(ARROW_LENGTH))
 			gohome.DrawColor = colornames.Red
 		case Y_AXIS:
-			point1 = this.translateY.Transform.GetPosition()
-			point2 = point1.Add(mgl32.Vec3{0.0, 1.0, 0.0}.Mul(ARROW_LENGTH))
 			gohome.DrawColor = colornames.Lime
 		case Z_AXIS:
-			point1 = this.translateZ.Transform.GetPosition()
-			point2 = point1.Add(mgl32.Vec3{0.0, 0.0, 1.0}.Mul(ARROW_LENGTH))
 			gohome.DrawColor = colornames.Mediumblue
 		}
 
-		mid := point1.Add(point2.Sub(point1).Mul(0.5))
-		left := point1.Sub(mid).Normalize()
-		right := point2.Sub(mid).Normalize()
-
-		point1 = mid.Add(left.Mul(ARROW_LINE_LENGTH / 2.0))
-		point2 = mid.Add(right.Mul(ARROW_LINE_LENGTH / 2.0))
-		this.points3D[0] = point1
-		this.points3D[1] = point2
-		var wg sync.WaitGroup
-		wg.Add(1)
-		go convert3Dto2D(point1, &point12D, &wg)
-		wg.Wait()
-		wg.Add(1)
-		go convert3Dto2D(point2, &point22D, &wg)
-		wg.Wait()
-		this.points[0] = point12D
-		this.points[1] = point22D
-
-		gohome.DrawLine3D(point1, point2)
+		gohome.DrawLine3D(this.points3D[0], this.points3D[1])
 	}
 }

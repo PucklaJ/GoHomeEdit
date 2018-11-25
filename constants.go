@@ -15,7 +15,7 @@ const (
 	NUM_SMOOTH_PAN    int = 5
 
 	ARROW_LENGTH      float32 = 2.3
-	ARROW_WIDTH       float32 = 6.0
+	ARROW_WIDTH       float32 = 10.0
 	ARROW_LINE_LENGTH float32 = 200.0
 
 	TRANSFORM_MOVE_SPEED float32 = 0.01
