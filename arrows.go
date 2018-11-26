@@ -90,163 +90,77 @@ type Arrows struct {
 
 	IsTransforming uint8
 
-	points   [2]mgl32.Vec2
 	points3D [2]mgl32.Vec3
 }
 
 func (this *Arrows) Init() {
 	gohome.ResourceMgr.LoadLevel("Arrows", "arrows.obj", true)
 
-	this.translateX.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Arrow_Cone"))
-	this.translateY.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Arrow_Cone").Copy())
-	this.translateZ.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Arrow_Cone").Copy())
+	this.initMove()
+	this.initScale()
+	this.initRotate()
 
-	this.scaleX.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Block_Cube.001"))
-	this.scaleY.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Block_Cube.001").Copy())
-	this.scaleZ.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Block_Cube.001").Copy())
-
-	/*this.rotateX.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Block_Cube"))
-	this.rotateY.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Block_Cube").Copy())
-	this.rotateZ.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Block_Cube").Copy())*/
-
-	this.translateX.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = colornames.Red
-	this.translateY.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = colornames.Lime
-	this.translateZ.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = colornames.Mediumblue
-
-	this.scaleX.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = colornames.Red
-	this.scaleY.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = colornames.Lime
-	this.scaleZ.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = colornames.Mediumblue
-
-	/*this.rotateX.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = colornames.Red
-	this.rotateY.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = colornames.Lime
-	this.rotateZ.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = colornames.Mediumblue*/
-
-	this.translateX.Transform.Rotation = mgl32.QuatRotate(mgl32.DegToRad(-90.0), mgl32.Vec3{0.0, 1.0, 0.0})
-	this.translateY.Transform.Rotation = mgl32.QuatRotate(mgl32.DegToRad(90.0), mgl32.Vec3{1.0, 0.0, 0.0})
-	this.translateZ.Transform.Rotation = mgl32.QuatRotate(mgl32.DegToRad(180.0), mgl32.Vec3{1.0, 0.0, 0.0})
-
-	this.scaleX.Transform.Rotation = mgl32.QuatRotate(mgl32.DegToRad(180.0), mgl32.Vec3{0.0, 0.0, 1.0})
-	this.scaleY.Transform.Rotation = mgl32.QuatRotate(mgl32.DegToRad(-90.0), mgl32.Vec3{0.0, 0.0, 1.0})
-	this.scaleZ.Transform.Rotation = mgl32.QuatRotate(mgl32.DegToRad(90.0), mgl32.Vec3{0.0, 1.0, 0.0})
-
-	/*this.rotateX.Transform.Rotation = mgl32.QuatRotate(mgl32.DegToRad(180.0), mgl32.Vec3{0.0, 0.0, 1.0})
-	this.rotateY.Transform.Rotation = mgl32.QuatRotate(mgl32.DegToRad(-90.0), mgl32.Vec3{0.0, 0.0, 1.0})
-	this.rotateZ.Transform.Rotation = mgl32.QuatRotate(mgl32.DegToRad(90.0), mgl32.Vec3{0.0, 1.0, 0.0})*/
-
-	this.translateX.Transform.IgnoreParentRotation = true
-	this.translateX.Transform.IgnoreParentScale = true
-	this.translateX.DepthTesting = false
-	this.translateX.RenderLast = true
-	this.translateY.Transform.IgnoreParentRotation = true
-	this.translateY.Transform.IgnoreParentScale = true
-	this.translateY.DepthTesting = false
-	this.translateY.RenderLast = true
-	this.translateZ.Transform.IgnoreParentRotation = true
-	this.translateZ.Transform.IgnoreParentScale = true
-	this.translateZ.DepthTesting = false
-	this.translateZ.RenderLast = true
-
-	this.scaleX.Transform.IgnoreParentRotation = true
-	this.scaleX.Transform.IgnoreParentScale = true
-	this.scaleX.DepthTesting = false
-	this.scaleX.RenderLast = true
-	this.scaleY.Transform.IgnoreParentRotation = true
-	this.scaleY.Transform.IgnoreParentScale = true
-	this.scaleY.DepthTesting = false
-	this.scaleY.RenderLast = true
-	this.scaleZ.Transform.IgnoreParentRotation = true
-	this.scaleZ.Transform.IgnoreParentScale = true
-	this.scaleZ.DepthTesting = false
-	this.scaleZ.RenderLast = true
-
-	/*this.rotateX.Transform.IgnoreParentRotation = true
-	this.rotateX.Transform.IgnoreParentScale = true
-	this.rotateX.DepthTesting = false
-	this.rotateX.RenderLast = true
-	this.rotateY.Transform.IgnoreParentRotation = true
-	this.rotateY.Transform.IgnoreParentScale = true
-	this.rotateY.DepthTesting = false
-	this.rotateY.RenderLast = true
-	this.rotateZ.Transform.IgnoreParentRotation = true
-	this.rotateZ.Transform.IgnoreParentScale = true
-	this.rotateZ.DepthTesting = false
-	this.rotateZ.RenderLast = true*/
-
-	gohome.RenderMgr.AddObject(&this.translateX)
-	gohome.RenderMgr.AddObject(&this.translateY)
-	gohome.RenderMgr.AddObject(&this.translateZ)
-	gohome.RenderMgr.AddObject(&this.scaleX)
-	gohome.RenderMgr.AddObject(&this.scaleY)
-	gohome.RenderMgr.AddObject(&this.scaleZ)
-	/*gohome.RenderMgr.AddObject(&this.rotateX)
-	gohome.RenderMgr.AddObject(&this.rotateY)
-	gohome.RenderMgr.AddObject(&this.rotateZ)*/
 	gohome.UpdateMgr.AddObject(this)
 	gohome.RenderMgr.AddObject(this)
 
 	this.IsTransforming = 0
-	this.points[0] = [2]float32{1.0, 1.0}
-	this.points[1] = [2]float32{2.0, 2.0}
-	this.points3D[0] = [3]float32{1.0, 1.0, 1.0}
-	this.points3D[1] = [3]float32{2.0, 2.0, 2.0}
 }
 
 func (this *Arrows) SetScale() {
-	cam := camera.Position
-	if current_mode == MODE_MOVE {
-		txs := this.translateX.Transform.GetPosition().Sub(cam).Len() * ARROWS_SIZE
-		tys := this.translateY.Transform.GetPosition().Sub(cam).Len() * ARROWS_SIZE
-		tzs := this.translateZ.Transform.GetPosition().Sub(cam).Len() * ARROWS_SIZE
+	var wg sync.WaitGroup
+	wg.Add(3)
+	go func() {
+		if current_mode == MODE_MOVE {
+			wg.Add(2)
+			go func() {
+				this.setScaleMove()
+				wg.Done()
+			}()
+			go func() {
+				this.setVisibleMove()
+				wg.Done()
+			}()
+		} else {
+			this.setInvisibleMove()
+		}
+		wg.Done()
+	}()
 
-		this.translateX.Transform.Scale = [3]float32{txs, txs, txs}
-		this.translateY.Transform.Scale = [3]float32{tys, tys, tys}
-		this.translateZ.Transform.Scale = [3]float32{tzs, tzs, tzs}
+	go func() {
+		if current_mode == MODE_SCALE {
+			wg.Add(2)
+			go func() {
+				this.setScaleScale()
+				wg.Done()
+			}()
+			go func() {
+				this.setVisibleScale()
+				wg.Done()
+			}()
+		} else {
+			this.setInvisibleScale()
+		}
+		wg.Done()
+	}()
+	wg.Done()
+	/*go func() {
+		if current_mode == MODE_ROTATE {
+			wg.Add(2)
+			go func() {
+				this.setScaleRotate()
+				wg.Done()
+			}()
+			go func() {
+				this.setVisibleRotate()
+				wg.Done()
+			}()
+		} else {
+			this.setInvisibleRotate()
+		}
+		wg.Done()
+	}()*/
 
-		this.translateX.Visible = true
-		this.translateY.Visible = true
-		this.translateZ.Visible = true
-	} else {
-		this.translateX.Visible = false
-		this.translateY.Visible = false
-		this.translateZ.Visible = false
-	}
-
-	if current_mode == MODE_SCALE {
-		sxs := this.scaleX.Transform.GetPosition().Sub(cam).Len() * ARROWS_SIZE
-		sys := this.scaleY.Transform.GetPosition().Sub(cam).Len() * ARROWS_SIZE
-		szs := this.scaleZ.Transform.GetPosition().Sub(cam).Len() * ARROWS_SIZE
-
-		this.scaleX.Transform.Scale = [3]float32{sxs, sxs, sxs}
-		this.scaleY.Transform.Scale = [3]float32{sys, sys, sys}
-		this.scaleZ.Transform.Scale = [3]float32{szs, szs, szs}
-
-		this.scaleX.Visible = true
-		this.scaleY.Visible = true
-		this.scaleZ.Visible = true
-	} else {
-		this.scaleX.Visible = false
-		this.scaleY.Visible = false
-		this.scaleZ.Visible = false
-	}
-
-	/*if current_mode == MODE_ROTATE {
-		rxs := this.rotateX.Transform.GetPosition().Sub(cam).Len() * ARROWS_SIZE
-		rys := this.rotateY.Transform.GetPosition().Sub(cam).Len() * ARROWS_SIZE
-		rzs := this.rotateZ.Transform.GetPosition().Sub(cam).Len() * ARROWS_SIZE
-
-		this.rotateX.Transform.Scale = [3]float32{rxs, rxs, rxs}
-		this.rotateY.Transform.Scale = [3]float32{rys, rys, rys}
-		this.rotateZ.Transform.Scale = [3]float32{rzs, rzs, rzs}
-
-		this.rotateX.Visible = true
-		this.rotateY.Visible = true
-		this.rotateZ.Visible = true
-	} else {
-		this.rotateX.Visible = false
-		this.rotateY.Visible = false
-		this.rotateZ.Visible = false
-	}*/
-
+	wg.Wait()
 }
 
 func (this *Arrows) Update(detla_time float32) {
@@ -272,58 +186,8 @@ func (this *Arrows) SetParent(parent interface{}) {
 	this.rotateZ.SetParent(parent)*/
 
 	if parent != nil {
-		this.translateX.Transform.Position = [3]float32{0.0, 0.0, 0.0}
-		this.translateY.Transform.Position = [3]float32{0.0, 0.0, 0.0}
-		this.translateZ.Transform.Position = [3]float32{0.0, 0.0, 0.0}
-
-		this.scaleX.Transform.Position = [3]float32{0.0, 0.0, 0.0}
-		this.scaleY.Transform.Position = [3]float32{0.0, 0.0, 0.0}
-		this.scaleZ.Transform.Position = [3]float32{0.0, 0.0, 0.0}
-
-		/*this.rotateX.Transform.Position = [3]float32{0.0, 0.0, 0.0}
-		this.rotateY.Transform.Position = [3]float32{0.0, 0.0, 0.0}
-		this.rotateZ.Transform.Position = [3]float32{0.0, 0.0, 0.0}*/
+		this.centerArrows()
 	}
-}
-
-func (this *Arrows) calculateAllMatrices() {
-	var wg sync.WaitGroup
-
-	wg.Add(5)
-	go func() {
-		camera.CalculateViewMatrix()
-		wg.Done()
-	}()
-	go func() {
-		gohome.RenderMgr.Projection3D.CalculateProjectionMatrix()
-		wg.Done()
-	}()
-	go func() {
-		this.translateX.Transform.CalculateTransformMatrix(&gohome.RenderMgr, -1)
-		wg.Done()
-	}()
-	go func() {
-		this.translateY.Transform.CalculateTransformMatrix(&gohome.RenderMgr, -1)
-		wg.Done()
-	}()
-	go func() {
-		this.translateZ.Transform.CalculateTransformMatrix(&gohome.RenderMgr, -1)
-		wg.Done()
-	}()
-	wg.Wait()
-}
-
-func convert3Dto2D(pos mgl32.Vec3, pos2 *mgl32.Vec2, wg *sync.WaitGroup) {
-	vmat := camera.GetViewMatrix()
-	pmat := gohome.RenderMgr.Projection3D.GetProjectionMatrix()
-	mat := pmat.Mul4(vmat)
-	pos4 := mat.Mul4x1(pos.Vec4(1))
-	pos3 := pos4.Div(pos4.W()).Vec3()
-	nres := gohome.Render.GetNativeResolution()
-
-	*pos2 = pos3.Vec2()
-	*pos2 = pos2.MulVec([2]float32{1.0, -1.0}).Add([2]float32{1.0, 1.0}).Div(2.0).MulVec(nres)
-	wg.Done()
 }
 
 func calculateRectangle(pos, dir mgl32.Vec2, points *[4]mgl32.Vec2, wg *sync.WaitGroup) {
@@ -341,7 +205,6 @@ func calculateRectangle(pos, dir mgl32.Vec2, points *[4]mgl32.Vec2, wg *sync.Wai
 }
 
 func calculateRectangles(pos, xdir, ydir, zdir mgl32.Vec2) (pointsx, pointsy, pointsz [4]mgl32.Vec2) {
-
 	var wg sync.WaitGroup
 	wg.Add(3)
 	go calculateRectangle(pos, xdir, &pointsx, &wg)
@@ -363,8 +226,8 @@ func (this *Arrows) getMovePosAndDirections() (pos, xdir, ydir, zdir mgl32.Vec2)
 	y := mgl32.Vec3{0.0, 1.0, 0.0}
 	z := mgl32.Vec3{0.0, 0.0, 1.0}
 	xpos := this.translateX.Transform.GetPosition()
-	ypos := this.translateY.Transform.GetPosition()
-	zpos := this.translateZ.Transform.GetPosition()
+	ypos := xpos
+	zpos := xpos
 	scale := this.translateX.Transform.Scale[0]
 	var wg sync.WaitGroup
 	wg.Add(4)
@@ -398,7 +261,6 @@ func (this *Arrows) ResetPosition() {
 
 func (this *Arrows) CalculatePoints() {
 	var point1, point2 mgl32.Vec3
-	var point12D, point22D mgl32.Vec2
 
 	switch this.IsTransforming {
 	case X_AXIS:
@@ -423,15 +285,6 @@ func (this *Arrows) CalculatePoints() {
 	point2 = mid.Add(right.Mul(ARROW_LINE_LENGTH / 2.0))
 	this.points3D[0] = point1
 	this.points3D[1] = point2
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go convert3Dto2D(point1, &point12D, &wg)
-	wg.Wait()
-	wg.Add(1)
-	go convert3Dto2D(point2, &point22D, &wg)
-	wg.Wait()
-	this.points[0] = point12D
-	this.points[1] = point22D
 }
 
 func (this *Arrows) drawHitboxes() {
@@ -449,17 +302,9 @@ func (this *Arrows) drawHitboxes() {
 func (this *Arrows) Render() {
 
 	if this.IsTransforming != 0 {
-		this.translateX.Visible = false
-		this.translateY.Visible = false
-		this.translateZ.Visible = false
-
-		this.scaleX.Visible = false
-		this.scaleY.Visible = false
-		this.scaleZ.Visible = false
-
-		this.rotateX.Visible = false
-		this.rotateY.Visible = false
-		this.rotateZ.Visible = false
+		this.setInvisibleMove()
+		this.setInvisibleScale()
+		this.setInvisibleRotate()
 
 		switch this.IsTransforming {
 		case X_AXIS:
