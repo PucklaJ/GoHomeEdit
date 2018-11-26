@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
+	"github.com/PucklaMotzer09/mathgl/mgl32"
 )
 
 type CameraUpdater struct {
@@ -65,11 +66,16 @@ func updateCameraRotation() {
 	if !gohome.InputMgr.IsPressed(gohome.MouseButtonRight) {
 		dx, dy = 0.0, 0.0
 	}
-	smooth_deltas[current_smooth_delta][0] = dx
-	smooth_deltas[current_smooth_delta][1] = dy
-	dx, dy = smoothDeltas()
-	if mgl32.Abs(dx) > MAX_DELTA || mgl32.Abs(dy) > MAX_DELTA {
-		return
+	if gohome.InputMgr.IsPressed(gohome.MouseButtonRight) && (gohome.InputMgr.IsPressed(gohome.KeyLeftShift) || gohome.InputMgr.IsPressed(gohome.KeyRightShift)) {
+		dx, dy = 0.0, 0.0
+		camera_pitch, camera_yaw = 0.0, 0.0
+	} else {
+		smooth_deltas[current_smooth_delta][0] = dx
+		smooth_deltas[current_smooth_delta][1] = dy
+		dx, dy = smoothDeltas()
+		if mgl32.Abs(dx) > MAX_DELTA || mgl32.Abs(dy) > MAX_DELTA {
+			return
+		}
 	}
 	yaw, pitch := mgl32.DegToRad(-dx*CAM_ROTATE_VELOCITY), mgl32.DegToRad(dy*CAM_ROTATE_VELOCITY)
 
@@ -121,9 +127,13 @@ func updateCameraZoom() {
 
 	wy := float32(gohome.InputMgr.Mouse.Wheel[1])
 	zoom := wy * CAM_ZOOM_VELOCITY
-	smooth_zooms[current_smooth_zoom] = zoom
-	zoom = smoothZooms()
-	camera_zoom = mgl32.Clamp(camera_zoom-zoom, MIN_ZOOM, MAX_ZOOM)
+	if zoom != 0.0 && (gohome.InputMgr.IsPressed(gohome.KeyLeftShift) || gohome.InputMgr.IsPressed(gohome.KeyRightShift)) {
+		camera_zoom = MID_ZOOM
+	} else {
+		smooth_zooms[current_smooth_zoom] = zoom
+		zoom = smoothZooms()
+		camera_zoom = mgl32.Clamp(camera_zoom-zoom, MIN_ZOOM, MAX_ZOOM)
+	}
 }
 
 var smooth_pans [NUM_SMOOTH_PAN][2]float32
@@ -173,6 +183,11 @@ func updateCameraPanning() {
 	up = rotateYaw.Mul4(rotatePitch).Mul4x1(up.Vec4(0.0)).Vec3()
 	right := up.Cross(camera.LookDirection).Normalize()
 	vec := up.Mul(pany).Add(right.Mul(panx))
-	camera.Position = camera.Position.Add(vec)
-	camera_center = camera.Position.Add(camera.LookDirection.Mul(camera_zoom))
+	if gohome.InputMgr.IsPressed(gohome.MouseButtonMiddle) && (gohome.InputMgr.IsPressed(gohome.KeyLeftShift) || gohome.InputMgr.IsPressed(gohome.KeyRightShift)) {
+		camera_center = mgl32.Vec3{0.0, 0.0, 0.0}
+		camera.Position = camera_center.Add(camera.LookDirection.Mul(-camera_zoom))
+	} else {
+		camera.Position = camera.Position.Add(vec)
+		camera_center = camera.Position.Add(camera.LookDirection.Mul(camera_zoom))
+	}
 }
