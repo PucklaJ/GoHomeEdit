@@ -90,6 +90,8 @@ func onLeftClick() {
 		}
 	} else if current_mode == MODE_MOVE {
 		handleMoveArrowClick()
+	} else if current_mode == MODE_SCALE {
+		handleScaleArrowClick()
 	}
 }
 

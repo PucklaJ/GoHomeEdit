@@ -235,19 +235,26 @@ func calculateRectangles(pos, xdir, ydir, zdir mgl32.Vec2) (pointsx, pointsy, po
 
 func (this *Arrows) GetMoveHitboxes() (pointsx, pointsy, pointsz [4]mgl32.Vec2) {
 	this.calculateAllMatrices()
-	pos, xdir, ydir, zdir := this.getMovePosAndDirections()
+	pos, xdir, ydir, zdir := this.getPosAndDirections(&this.translateX)
 	pointsx, pointsy, pointsz = calculateRectangles(pos, xdir, ydir, zdir)
 	return
 }
 
-func (this *Arrows) getMovePosAndDirections() (pos, xdir, ydir, zdir mgl32.Vec2) {
+func (this *Arrows) GetScaleHitboxes() (pointsx, pointsy, pointsz [4]mgl32.Vec2) {
+	this.calculateAllMatrices()
+	pos, xdir, ydir, zdir := this.getPosAndDirections(&this.scaleX)
+	pointsx, pointsy, pointsz = calculateRectangles(pos, xdir, ydir, zdir)
+	return
+}
+
+func (this *Arrows) getPosAndDirections(arrow *ArrowEntity3D) (pos, xdir, ydir, zdir mgl32.Vec2) {
 	x := mgl32.Vec3{1.0, 0.0, 0.0}
 	y := mgl32.Vec3{0.0, 1.0, 0.0}
 	z := mgl32.Vec3{0.0, 0.0, 1.0}
-	xpos := this.translateX.Transform.GetPosition()
+	xpos := arrow.Transform.GetPosition()
 	ypos := xpos
 	zpos := xpos
-	scale := this.translateX.Transform.Scale[0]
+	scale := arrow.Transform.Scale[0]
 	var wg sync.WaitGroup
 	wg.Add(4)
 	go convert3Dto2D(xpos, &pos, &wg)

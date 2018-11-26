@@ -32,3 +32,4 @@ var transform_start mgl32.Vec3
 var is_transforming = false
 
 var transform_start_pos mgl32.Vec3
+var transform_start_scale mgl32.Vec3

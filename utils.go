@@ -72,7 +72,21 @@ func handleMoveArrowClick() {
 	pointsx, pointsy, pointsz := arrows.GetMoveHitboxes()
 	quadx, quady, quadz := gohome.QuadMath2D(pointsx), gohome.QuadMath2D(pointsy), gohome.QuadMath2D(pointsz)
 
-	checkMoveMouseInteractions(quadx, quady, quadz)
+	checkMouseIntersections(quadx, quady, quadz)
+}
+
+func handleScaleArrowClick() {
+	if selected_placed_object != nil {
+		transform_start_pos = selected_placed_object.Transform.GetPosition()
+		transform_start_scale = selected_placed_object.Transform.Scale
+	} else {
+		return
+	}
+
+	pointsx, pointsy, pointsz := arrows.GetScaleHitboxes()
+	quadx, quady, quadz := gohome.QuadMath2D(pointsx), gohome.QuadMath2D(pointsy), gohome.QuadMath2D(pointsz)
+
+	checkMouseIntersections(quadx, quady, quadz)
 }
 
 func getPlaneForIntersection(axis uint8) gohome.PlaneMath3D {
@@ -109,10 +123,17 @@ func handleTransforming() {
 
 	arrows.SetPosition()
 	arrows.SetInvisible()
+	planePos := getAxisProjectedPos(gohome.InputMgr.Mouse.ToScreenPosition(), arrows.TransformAxis, selected_placed_object)
 
 	if current_mode == MODE_MOVE {
-		planePos := getAxisProjectedPos(gohome.InputMgr.Mouse.ToScreenPosition(), arrows.TransformAxis, selected_placed_object)
 		selected_placed_object.Transform.Position = planePos.Sub(transform_start).Add(transform_start_pos)
+	} else if current_mode == MODE_SCALE {
+		len_all := arrows.points3D[1].Sub(arrows.points3D[0]).Len()
+		len_start := transform_start.Sub(arrows.points3D[0]).Len() / len_all
+		len_end := planePos.Sub(arrows.points3D[0]).Len() / len_all
+		len_dif := len_end - len_start
+		cam_dist := camera.Position.Sub(transform_start_pos).Len()
+		selected_placed_object.Transform.Scale[arrows.TransformAxis-1] = transform_start_scale[arrows.TransformAxis-1] + len_dif*TRANSFORM_SCALE_SPEED/cam_dist
 	}
 }
 

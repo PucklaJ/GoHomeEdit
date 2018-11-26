@@ -18,7 +18,7 @@ const (
 	ARROW_WIDTH       float32 = 10.0
 	ARROW_LINE_LENGTH float32 = 200.0
 
-	TRANSFORM_MOVE_SPEED float32 = 0.01
+	TRANSFORM_SCALE_SPEED float32 = 1000.0
 )
 
 // PlacingObject Shader
