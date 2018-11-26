@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
 	"github.com/PucklaMotzer09/mathgl/mgl32"
-	"golang.org/x/image/colornames"
 	"sync"
 )
 
@@ -12,9 +11,9 @@ func (this *Arrows) initRotate() {
 	this.rotateY.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Block_Cube").Copy())
 	this.rotateZ.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Block_Cube").Copy())*/
 
-	/*this.rotateX.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = colornames.Red
-	this.rotateY.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = colornames.Lime
-	this.rotateZ.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = colornames.Mediumblue*/
+	/*this.rotateX.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = X_COLOR
+	this.rotateY.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = Y_COLOR
+	this.rotateZ.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = Z_COLOR*/
 
 	/*this.rotateX.Transform.Rotation = mgl32.QuatRotate(mgl32.DegToRad(180.0), mgl32.Vec3{0.0, 0.0, 1.0})
 	this.rotateY.Transform.Rotation = mgl32.QuatRotate(mgl32.DegToRad(-90.0), mgl32.Vec3{0.0, 0.0, 1.0})
@@ -43,9 +42,9 @@ func (this *Arrows) initScale() {
 	this.scaleY.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Block_Cube.001").Copy())
 	this.scaleZ.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Block_Cube.001").Copy())
 
-	this.scaleX.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = colornames.Red
-	this.scaleY.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = colornames.Lime
-	this.scaleZ.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = colornames.Mediumblue
+	this.scaleX.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = X_COLOR
+	this.scaleY.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = Y_COLOR
+	this.scaleZ.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = Z_COLOR
 
 	this.scaleX.Transform.Rotation = mgl32.QuatRotate(mgl32.DegToRad(180.0), mgl32.Vec3{0.0, 0.0, 1.0})
 	this.scaleY.Transform.Rotation = mgl32.QuatRotate(mgl32.DegToRad(-90.0), mgl32.Vec3{0.0, 0.0, 1.0})
@@ -74,9 +73,9 @@ func (this *Arrows) initMove() {
 	this.translateY.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Arrow_Cone").Copy())
 	this.translateZ.InitModel(gohome.ResourceMgr.GetLevel("Arrows").GetModel("Arrow_Cone").Copy())
 
-	this.translateX.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = colornames.Red
-	this.translateY.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = colornames.Lime
-	this.translateZ.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = colornames.Mediumblue
+	this.translateX.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = X_COLOR
+	this.translateY.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = Y_COLOR
+	this.translateZ.Model3D.GetMeshIndex(0).GetMaterial().DiffuseColor = Z_COLOR
 
 	this.translateX.Transform.Rotation = mgl32.QuatRotate(mgl32.DegToRad(-90.0), mgl32.Vec3{0.0, 1.0, 0.0})
 	this.translateY.Transform.Rotation = mgl32.QuatRotate(mgl32.DegToRad(90.0), mgl32.Vec3{1.0, 0.0, 0.0})

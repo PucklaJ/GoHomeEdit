@@ -21,6 +21,7 @@ var place_id uint32 = 0
 var placed_models map[uint32]*PlacedModel
 
 var selected_model uint32
+var selected_placed_object *PlacedObject
 
 var current_mode Mode = MODE_PLACE
 

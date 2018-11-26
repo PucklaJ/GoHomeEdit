@@ -63,10 +63,8 @@ func loadLoadableModels() {
 }
 
 func handleMoveArrowClick() {
-	var m *PlacedModel
-	var ok bool
-	if m, ok = placed_models[place_id-1]; ok {
-		transform_start_pos = m.Entity3D.Transform.GetPosition()
+	if selected_placed_object != nil {
+		transform_start_pos = selected_placed_object.Transform.GetPosition()
 	} else {
 		return
 	}
@@ -90,9 +88,9 @@ func getPlaneForIntersection(axis uint8) gohome.PlaneMath3D {
 	return X_PLANES[0]
 }
 
-func getAxisProjectedPos(screenPos mgl32.Vec2, axis uint8, m *PlacedModel) mgl32.Vec3 {
+func getAxisProjectedPos(screenPos mgl32.Vec2, axis uint8, m *PlacedObject) mgl32.Vec3 {
 	plane := getPlaneForIntersection(axis)
-	changePlanePoint(&plane, m.Entity3D.Transform.Position)
+	changePlanePoint(&plane, m.Transform.Position)
 
 	mray := gohome.ScreenPositionToRay(screenPos)
 	planePos := mray.PlaneIntersect(camera.Position, plane.Normal, plane.Point)
@@ -105,16 +103,16 @@ func handleTransforming() {
 	if !is_transforming {
 		return
 	}
-	m, ok := placed_models[place_id-1]
-	if !ok {
+	if selected_placed_object == nil {
 		return
 	}
 
 	arrows.SetPosition()
+	arrows.SetInvisible()
 
 	if current_mode == MODE_MOVE {
-		planePos := getAxisProjectedPos(gohome.InputMgr.Mouse.ToScreenPosition(), arrows.IsTransforming, m)
-		m.Entity3D.Transform.Position = planePos.Sub(transform_start).Add(transform_start_pos)
+		planePos := getAxisProjectedPos(gohome.InputMgr.Mouse.ToScreenPosition(), arrows.TransformAxis, selected_placed_object)
+		selected_placed_object.Transform.Position = planePos.Sub(transform_start).Add(transform_start_pos)
 	}
 }
 

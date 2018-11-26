@@ -86,6 +86,7 @@ func onLeftClick() {
 
 			gohome.RenderMgr.AddObject(&pm.Entity3D)
 			pm.PlacedObject.Transform.Position = camera_center
+			selected_placed_object = &pm.PlacedObject
 		}
 	} else if current_mode == MODE_MOVE {
 		handleMoveArrowClick()
@@ -94,7 +95,7 @@ func onLeftClick() {
 
 func onLeftClickRelease() {
 	is_transforming = false
-	arrows.IsTransforming = 0
+	arrows.TransformAxis = 0
 	arrows.ResetPosition()
 	arrows.SetScale()
 }

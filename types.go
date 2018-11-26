@@ -35,6 +35,10 @@ type PlacedObject struct {
 	AABB      gohome.AxisAlignedBoundingBox
 }
 
+func (this *PlacedObject) GetTransform3D() *gohome.TransformableObject3D {
+	return this.Transform
+}
+
 type PlacedModel struct {
 	gohome.Entity3D
 	PlacedObject

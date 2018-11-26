@@ -18,8 +18,8 @@ func checkIntersection(quad gohome.QuadMath2D, mpos mgl32.Vec2, axis uint8, inte
 	}
 }
 
-func finishIntersection(axis uint8, mpos mgl32.Vec2, m *PlacedModel) {
-	arrows.IsTransforming = axis
+func finishIntersection(axis uint8, mpos mgl32.Vec2, m *PlacedObject) {
+	arrows.TransformAxis = axis
 	is_transforming = true
 	arrows.CalculatePoints()
 	transform_start = getAxisProjectedPos(mpos, axis, m)
@@ -38,7 +38,7 @@ func allIntersected(intersected [3]uint8) bool {
 func checkMoveMouseInteractions(quadx, quady, quadz gohome.QuadMath2D) {
 	intersect_channel := make(chan intersect_data)
 	var intersected = [3]uint8{2, 2, 2}
-	m := placed_models[place_id-1]
+	m := selected_placed_object
 	mpos := gohome.InputMgr.Mouse.ToScreenPosition()
 
 	go checkIntersection(quadx, mpos, X_AXIS, intersect_channel)

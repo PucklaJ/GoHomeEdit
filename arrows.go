@@ -16,6 +16,12 @@ const (
 )
 
 var (
+	X_COLOR = colornames.Red
+	Y_COLOR = colornames.Lime
+	Z_COLOR = colornames.Mediumblue
+)
+
+var (
 	X_PLANES = [4]gohome.PlaneMath3D{
 		{
 			mgl32.Vec3{0.0, 0.0, 1.0},
@@ -74,21 +80,33 @@ var (
 	}
 )
 
+type ArrowEntity3D struct {
+	gohome.Entity3D
+}
+
+func (this *ArrowEntity3D) Render() {
+	gohome.Render.SetWireFrame(false)
+	this.Entity3D.Render()
+	if gohome.RenderMgr.WireFrameMode {
+		gohome.Render.SetWireFrame(true)
+	}
+}
+
 type Arrows struct {
 	gohome.NilRenderObject
-	translateX gohome.Entity3D
-	translateY gohome.Entity3D
-	translateZ gohome.Entity3D
+	translateX ArrowEntity3D
+	translateY ArrowEntity3D
+	translateZ ArrowEntity3D
 
-	scaleX gohome.Entity3D
-	scaleY gohome.Entity3D
-	scaleZ gohome.Entity3D
+	scaleX ArrowEntity3D
+	scaleY ArrowEntity3D
+	scaleZ ArrowEntity3D
 
-	rotateX gohome.Entity3D
-	rotateY gohome.Entity3D
-	rotateZ gohome.Entity3D
+	rotateX ArrowEntity3D
+	rotateY ArrowEntity3D
+	rotateZ ArrowEntity3D
 
-	IsTransforming uint8
+	TransformAxis uint8
 
 	points3D [2]mgl32.Vec3
 }
@@ -103,7 +121,7 @@ func (this *Arrows) Init() {
 	gohome.UpdateMgr.AddObject(this)
 	gohome.RenderMgr.AddObject(this)
 
-	this.IsTransforming = 0
+	this.TransformAxis = 0
 }
 
 func (this *Arrows) SetScale() {
@@ -165,10 +183,11 @@ func (this *Arrows) SetScale() {
 
 func (this *Arrows) Update(detla_time float32) {
 	this.SetScale()
-	if !is_transforming && len(placed_models) != 0 {
-		this.SetParent(&placed_models[place_id-1].Entity3D)
+	if !is_transforming && selected_placed_object != nil {
+		this.SetParent(selected_placed_object)
 	} else {
 		this.SetParent(nil)
+		this.SetInvisible()
 	}
 }
 
@@ -254,27 +273,25 @@ func (this *Arrows) SetPosition() {
 }
 
 func (this *Arrows) ResetPosition() {
-	if m, ok := placed_models[place_id-1]; ok {
-		this.SetParent(&m.Entity3D)
-	}
+	this.SetParent(selected_placed_object)
 }
 
 func (this *Arrows) CalculatePoints() {
 	var point1, point2 mgl32.Vec3
 
-	switch this.IsTransforming {
+	switch this.TransformAxis {
 	case X_AXIS:
 		point1 = this.translateX.Transform.GetPosition()
 		point2 = point1.Add(mgl32.Vec3{1.0, 0.0, 0.0}.Mul(ARROW_LENGTH))
-		gohome.DrawColor = colornames.Red
+		gohome.DrawColor = X_COLOR
 	case Y_AXIS:
 		point1 = this.translateY.Transform.GetPosition()
 		point2 = point1.Add(mgl32.Vec3{0.0, 1.0, 0.0}.Mul(ARROW_LENGTH))
-		gohome.DrawColor = colornames.Lime
+		gohome.DrawColor = Y_COLOR
 	case Z_AXIS:
 		point1 = this.translateZ.Transform.GetPosition()
 		point2 = point1.Add(mgl32.Vec3{0.0, 0.0, 1.0}.Mul(ARROW_LENGTH))
-		gohome.DrawColor = colornames.Mediumblue
+		gohome.DrawColor = Z_COLOR
 	}
 
 	mid := point1.Add(point2.Sub(point1).Mul(0.5))
@@ -291,30 +308,51 @@ func (this *Arrows) drawHitboxes() {
 	pointsx, pointsy, pointsz := this.GetMoveHitboxes()
 
 	gohome.Filled = false
-	gohome.DrawColor = colornames.Red
+	gohome.DrawColor = X_COLOR
 	gohome.DrawRectangle2D(pointsx[0], pointsx[1], pointsx[2], pointsx[3])
-	gohome.DrawColor = colornames.Lime
+	gohome.DrawColor = Y_COLOR
 	gohome.DrawRectangle2D(pointsy[0], pointsy[1], pointsy[2], pointsy[3])
-	gohome.DrawColor = colornames.Mediumblue
+	gohome.DrawColor = Z_COLOR
 	gohome.DrawRectangle2D(pointsz[0], pointsz[1], pointsz[2], pointsz[3])
 }
 
 func (this *Arrows) Render() {
 
-	if this.IsTransforming != 0 {
-		this.setInvisibleMove()
-		this.setInvisibleScale()
-		this.setInvisibleRotate()
+	if this.TransformAxis != 0 {
+		this.SetInvisible()
 
-		switch this.IsTransforming {
+		switch this.TransformAxis {
 		case X_AXIS:
-			gohome.DrawColor = colornames.Red
+			gohome.DrawColor = X_COLOR
 		case Y_AXIS:
-			gohome.DrawColor = colornames.Lime
+			gohome.DrawColor = Y_COLOR
 		case Z_AXIS:
-			gohome.DrawColor = colornames.Mediumblue
+			gohome.DrawColor = Z_COLOR
 		}
 
 		gohome.DrawLine3D(this.points3D[0], this.points3D[1])
+		if gohome.RenderMgr.WireFrameMode {
+			gohome.Render.SetWireFrame(true)
+		}
 	}
+}
+
+func (this *Arrows) SetVisible() {
+	this.setVisibleMove()
+	this.setVisibleScale()
+	this.setVisibleRotate()
+}
+
+func (this *Arrows) SetInvisible() {
+	this.setInvisibleMove()
+	this.setInvisibleScale()
+	this.setInvisibleRotate()
+}
+
+func (this *Arrows) GetType() gohome.RenderType {
+	return gohome.TYPE_2D_NORMAL
+}
+
+func (this *Arrows) HasDepthTesting() bool {
+	return false
 }
