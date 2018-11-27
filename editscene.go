@@ -6,6 +6,7 @@ import (
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
 	"github.com/PucklaMotzer09/mathgl/mgl32"
 	"golang.org/x/image/colornames"
+	"image/png"
 	"io/ioutil"
 	"os"
 )
@@ -119,6 +120,12 @@ func (this *EditScene) Update(delta_time float32) {
 	}
 	handleTransforming()
 	handlePlacing()
+
+	if gohome.InputMgr.JustPressed(gohome.KeyJ) {
+		file, _ := os.Create("screenshot.png")
+		png.Encode(file, gohome.TextureToImage(gohome.RenderMgr.BackBuffer, false, true))
+		file.Close()
+	}
 }
 
 func (this *EditScene) Terminate() {
