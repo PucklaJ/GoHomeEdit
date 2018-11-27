@@ -134,6 +134,8 @@ func updateCameraZoom() {
 		zoom = smoothZooms()
 		camera_zoom = mgl32.Clamp(camera_zoom-zoom, MIN_ZOOM, MAX_ZOOM)
 	}
+
+	PLACE_PLANE_DIST = camera_zoom
 }
 
 var smooth_pans [NUM_SMOOTH_PAN][2]float32

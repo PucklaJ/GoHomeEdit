@@ -161,3 +161,19 @@ func changePlanePoint(plane *gohome.PlaneMath3D, position mgl32.Vec3) {
 		plane.Point[2] = position.Z()
 	}
 }
+
+func handlePlacing() {
+	if current_mode != MODE_PLACE || placing_object.Model3D == nil {
+		return
+	}
+
+	mray := gohome.InputMgr.Mouse.ToRay()
+
+	var plane gohome.PlaneMath3D
+	plane.Normal = camera.LookDirection.Mul(-1)
+	plane.Point = camera.Position.Add(camera.LookDirection.Mul(PLACE_PLANE_DIST))
+
+	placePoint := mray.PlaneIntersect(camera.Position, plane.Normal, plane.Point)
+
+	placing_object.Transform.Position = placePoint
+}

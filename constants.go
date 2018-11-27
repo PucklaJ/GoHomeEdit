@@ -21,6 +21,8 @@ const (
 	TRANSFORM_SCALE_SPEED float32 = 1000.0
 )
 
+var PLACE_PLANE_DIST float32 = MID_ZOOM
+
 // PlacingObject Shader
 const (
 	PLACING_OBJECT_SHADER_FRAGMENT_SOURCE_OPENGL string = `

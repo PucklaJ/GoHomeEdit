@@ -50,7 +50,4 @@ func (this *PlacingObject) Update(delta_time float32) {
 	}
 
 	this.Visible = current_mode == MODE_PLACE && this.Model3D != nil
-	if this.Visible {
-		this.Transform.Position = camera_center
-	}
 }

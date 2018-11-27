@@ -119,6 +119,7 @@ func (this *EditScene) Update(delta_time float32) {
 		onLeftClickRelease()
 	}
 	handleTransforming()
+	handlePlacing()
 }
 
 func (this *EditScene) Terminate() {
