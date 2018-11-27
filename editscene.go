@@ -43,7 +43,6 @@ func (this *EditScene) InitGraphics() {
 	gohome.RenderMgr.UpdateProjectionWithViewport = true
 	gohome.ResourceMgr.LoadModelsWithSameName = true
 	dirl := &gohome.DirectionalLight{
-		CastsShadows:  0,
 		DiffuseColor:  colornames.Gray,
 		SpecularColor: colornames.Gray,
 		Direction: mgl32.Vec3{
@@ -51,7 +50,7 @@ func (this *EditScene) InitGraphics() {
 		}.Normalize(),
 	}
 	gohome.LightMgr.AddDirectionalLight(dirl, 0)
-	gohome.LightMgr.SetAmbientLight(colornames.Gray, 0)
+	gohome.LightMgr.SetAmbientLight(colornames.Darkgray, 0)
 
 	camera.Init()
 	camera.LookAt(mgl32.Vec3{0.0, 0.0, MID_ZOOM}, camera_center, mgl32.Vec3{0.0, 1.0, 0.0})

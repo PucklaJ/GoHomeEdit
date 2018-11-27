@@ -4,7 +4,6 @@ import (
 	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK/gtk"
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
 	"io/ioutil"
-	"os"
 )
 
 func updateResolution(widget gtk.Widget) {
@@ -34,17 +33,28 @@ func onToolScale(toolButton gtk.ToolButton) {
 
 func onToolLoadModel(toolButton gtk.ToolButton) {
 	fileChooser := gtk.FileChooserDialogNew("Load Model", gtk.GetWindow(), gtk.FILE_CHOOSER_ACTION_OPEN)
-	if fileChooser.ToDialog().Run() == gtk.RESPONSE_ACCEPT {
-		filename := fileChooser.ToFileChooser().GetFilename()
-		file, _ := os.Open(filename)
-		contents, _ := ioutil.ReadAll(file)
-		name := gohome.GetFileFromPath(filename)
 
-		var lm LoadableModel
-		lm.Name = name
-		lm.FileContents = string(contents)
-		lm.Filename = filename
-		loadable_models = append(loadable_models, lm)
+	filter := gtk.FileFilterNew()
+	filter.AddPattern("*.obj")
+
+	fileChooser.ToFileChooser().SetFilter(filter)
+	fileChooser.ToFileChooser().SetSelectMultiple(true)
+
+	if fileChooser.ToDialog().Run() == gtk.RESPONSE_ACCEPT {
+		filenames := fileChooser.ToFileChooser().GetFilenames()
+		for i := 0; i < len(filenames); i++ {
+			filename := filenames[i]
+			file, _ := gohome.Framew.OpenFile(filename)
+			contents, _ := ioutil.ReadAll(file)
+			file.Close()
+			name := gohome.GetFileFromPath(filename)
+
+			var lm LoadableModel
+			lm.Name = name
+			lm.FileContents = string(contents)
+			lm.Filename = filename
+			loadable_models = append(loadable_models, lm)
+		}
 	} else {
 		gohome.ErrorMgr.Error("Load", "Model", "An error acoured")
 	}
