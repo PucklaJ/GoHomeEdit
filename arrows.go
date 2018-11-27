@@ -24,58 +24,58 @@ var (
 var (
 	X_PLANES = [4]gohome.PlaneMath3D{
 		{
-			mgl32.Vec3{0.0, 0.0, 1.0},
-			mgl32.Vec3{1.0, 1.0, 0.0},
+			Normal: mgl32.Vec3{0.0, 0.0, 1.0},
+			Point:  mgl32.Vec3{1.0, 1.0, 0.0},
 		},
 		{
-			mgl32.Vec3{0.0, 0.0, -1.0},
-			mgl32.Vec3{1.0, 1.0, 0.0},
+			Normal: mgl32.Vec3{0.0, 0.0, -1.0},
+			Point:  mgl32.Vec3{1.0, 1.0, 0.0},
 		},
 		{
-			mgl32.Vec3{0.0, 1.0, 0.0},
-			mgl32.Vec3{1.0, 0.0, 1.0},
+			Normal: mgl32.Vec3{0.0, 1.0, 0.0},
+			Point:  mgl32.Vec3{1.0, 0.0, 1.0},
 		},
 		{
-			mgl32.Vec3{0.0, -1.0, 0.0},
-			mgl32.Vec3{1.0, 0.0, 1.0},
+			Normal: mgl32.Vec3{0.0, -1.0, 0.0},
+			Point:  mgl32.Vec3{1.0, 0.0, 1.0},
 		},
 	}
 
 	Y_PLANES = [4]gohome.PlaneMath3D{
 		{
-			mgl32.Vec3{0.0, 0.0, 1.0},
-			mgl32.Vec3{1.0, 1.0, 0.0},
+			Normal: mgl32.Vec3{0.0, 0.0, 1.0},
+			Point:  mgl32.Vec3{1.0, 1.0, 0.0},
 		},
 		{
-			mgl32.Vec3{0.0, 0.0, -1.0},
-			mgl32.Vec3{1.0, 1.0, 0.0},
+			Normal: mgl32.Vec3{0.0, 0.0, -1.0},
+			Point:  mgl32.Vec3{1.0, 1.0, 0.0},
 		},
 		{
-			mgl32.Vec3{1.0, 0.0, 0.0},
-			mgl32.Vec3{0.0, 1.0, 1.0},
+			Normal: mgl32.Vec3{1.0, 0.0, 0.0},
+			Point:  mgl32.Vec3{0.0, 1.0, 1.0},
 		},
 		{
-			mgl32.Vec3{-1.0, 0.0, 0.0},
-			mgl32.Vec3{0.0, 1.0, 1.0},
+			Normal: mgl32.Vec3{-1.0, 0.0, 0.0},
+			Point:  mgl32.Vec3{0.0, 1.0, 1.0},
 		},
 	}
 
 	Z_PLANES = [4]gohome.PlaneMath3D{
 		{
-			mgl32.Vec3{0.0, 1.0, 0.0},
-			mgl32.Vec3{1.0, 0.0, 1.0},
+			Normal: mgl32.Vec3{0.0, 1.0, 0.0},
+			Point:  mgl32.Vec3{1.0, 0.0, 1.0},
 		},
 		{
-			mgl32.Vec3{0.0, -1.0, 0.0},
-			mgl32.Vec3{1.0, 0.0, 1.0},
+			Normal: mgl32.Vec3{0.0, -1.0, 0.0},
+			Point:  mgl32.Vec3{1.0, 0.0, 1.0},
 		},
 		{
-			mgl32.Vec3{1.0, 0.0, 0.0},
-			mgl32.Vec3{0.0, 1.0, 1.0},
+			Normal: mgl32.Vec3{1.0, 0.0, 0.0},
+			Point:  mgl32.Vec3{0.0, 1.0, 1.0},
 		},
 		{
-			mgl32.Vec3{-1.0, 0.0, 0.0},
-			mgl32.Vec3{0.0, 1.0, 1.0},
+			Normal: mgl32.Vec3{-1.0, 0.0, 0.0},
+			Point:  mgl32.Vec3{0.0, 1.0, 1.0},
 		},
 	}
 )
