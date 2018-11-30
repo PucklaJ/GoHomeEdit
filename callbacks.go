@@ -68,6 +68,10 @@ func onMenuWireframe(menuItem gtk.MenuItem) {
 	gohome.RenderMgr.WireFrameMode = is_wireframe
 }
 
+func onMenuPlaceOnGrid(menuItem gtk.MenuItem) {
+	place_on_grid = !place_on_grid
+}
+
 func onSelectAsset(listBox gtk.ListBox, listBoxRow gtk.ListBoxRow) {
 	lbl := listBoxRow.ToContainer().GetChildren().Data().ToLabel()
 	data := lbl.ToGObject().GetData("ID")

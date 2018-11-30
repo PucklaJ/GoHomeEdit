@@ -35,4 +35,4 @@ var transform_start_pos mgl32.Vec3
 var transform_start_scale mgl32.Vec3
 
 var grid Grid
-var place_on_grid = true
+var place_on_grid = false
