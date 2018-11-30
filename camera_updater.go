@@ -9,6 +9,10 @@ type CameraUpdater struct {
 }
 
 func (this *CameraUpdater) Init() {
+	camera.Init()
+	camera.LookAt(mgl32.Vec3{MID_ZOOM, MID_ZOOM, MID_ZOOM}, camera_center, mgl32.Vec3{0.0, 1.0, 0.0})
+	gohome.RenderMgr.SetCamera3D(&camera, 0)
+
 	gohome.UpdateMgr.AddObject(this)
 }
 
@@ -68,7 +72,7 @@ func updateCameraRotation() {
 	}
 	if gohome.InputMgr.IsPressed(gohome.MouseButtonRight) && (gohome.InputMgr.IsPressed(gohome.KeyLeftShift) || gohome.InputMgr.IsPressed(gohome.KeyRightShift)) {
 		dx, dy = 0.0, 0.0
-		camera_pitch, camera_yaw = 0.0, 0.0
+		camera_pitch, camera_yaw = 3.1415/4.0, 3.1415/4.0
 	} else {
 		smooth_deltas[current_smooth_delta][0] = dx
 		smooth_deltas[current_smooth_delta][1] = dy

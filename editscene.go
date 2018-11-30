@@ -53,15 +53,13 @@ func (this *EditScene) InitGraphics() {
 	gohome.LightMgr.AddDirectionalLight(dirl, 0)
 	gohome.LightMgr.SetAmbientLight(colornames.Darkgray, 0)
 
-	camera.Init()
-	camera.LookAt(mgl32.Vec3{0.0, 0.0, MID_ZOOM}, camera_center, mgl32.Vec3{0.0, 1.0, 0.0})
-	gohome.RenderMgr.SetCamera3D(&camera, 0)
 	updateResolution(gtk.GetGLArea().ToWidget())
 
 	var cameraUpdater CameraUpdater
 	cameraUpdater.Init()
 	arrows.Init()
 	placing_object.Init()
+	grid.Init()
 }
 
 func (this *EditScene) InitTest() {

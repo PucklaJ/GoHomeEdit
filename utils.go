@@ -170,8 +170,13 @@ func handlePlacing() {
 	mray := gohome.InputMgr.Mouse.ToRay()
 
 	var plane gohome.PlaneMath3D
-	plane.Normal = camera.LookDirection.Mul(-1)
-	plane.Point = camera.Position.Add(camera.LookDirection.Mul(PLACE_PLANE_DIST))
+	if !place_on_grid {
+		plane.Normal = camera.LookDirection.Mul(-1)
+		plane.Point = camera.Position.Add(camera.LookDirection.Mul(PLACE_PLANE_DIST))
+	} else {
+		plane.Normal = mgl32.Vec3{0.0, 1.0, 0.0}
+		plane.Point = mgl32.Vec3{1.0, 0.0, 1.0}
+	}
 
 	placePoint := mray.PlaneIntersect(camera.Position, plane.Normal, plane.Point)
 
