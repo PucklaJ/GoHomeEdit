@@ -9,6 +9,7 @@ import (
 func updateResolution(widget gtk.Widget) {
 	w, h := widget.GetSize()
 	gohome.Render.SetNativeResolution(uint32(w), uint32(h))
+	pickable_texture.ChangeSize(uint32(w), uint32(h))
 }
 
 func quitApplication(menuItem gtk.MenuItem) {
@@ -90,6 +91,7 @@ func onLeftClick() {
 			model := loaded_models[pmodel.ID]
 			var pm PlacedModel
 			pm.Entity3D.InitModel(model)
+			pm.Entity3D.SetType(gohome.TYPE_3D_NORMAL | PICKABLE_BIT)
 			pm.PlacedObject.Transform = pm.Entity3D.Transform
 			pm.PlacedObject.AABB = model.AABB
 			pm.PlacedObject.PlaceID = place_id
@@ -103,9 +105,13 @@ func onLeftClick() {
 			selected_placed_object = &pm.PlacedObject
 		}
 	} else if current_mode == MODE_MOVE {
-		handleMoveArrowClick()
+		if !handleMoveArrowClick() {
+			handlePickableClick()
+		}
 	} else if current_mode == MODE_SCALE {
-		handleScaleArrowClick()
+		if !handleScaleArrowClick() {
+			handlePickableClick()
+		}
 	}
 }
 

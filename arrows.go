@@ -125,6 +125,9 @@ func (this *Arrows) Init() {
 }
 
 func (this *Arrows) SetScale() {
+	if selected_placed_object == nil {
+		return
+	}
 	var wg sync.WaitGroup
 	wg.Add(3)
 	go func() {
@@ -182,6 +185,10 @@ func (this *Arrows) SetScale() {
 }
 
 func (this *Arrows) Update(detla_time float32) {
+	if selected_placed_object == nil {
+		this.SetInvisible()
+		return
+	}
 	this.SetScale()
 	if !is_transforming && selected_placed_object != nil {
 		this.SetParent(selected_placed_object)

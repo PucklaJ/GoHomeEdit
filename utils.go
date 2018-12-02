@@ -5,6 +5,7 @@ import (
 	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK/gtk"
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
 	"github.com/PucklaMotzer09/mathgl/mgl32"
+	"golang.org/x/image/colornames"
 	"math"
 )
 
@@ -62,31 +63,31 @@ func loadLoadableModels() {
 	loadable_models = loadable_models[:0]
 }
 
-func handleMoveArrowClick() {
+func handleMoveArrowClick() bool {
 	if selected_placed_object != nil {
 		transform_start_pos = selected_placed_object.Transform.GetPosition()
 	} else {
-		return
+		return false
 	}
 
 	pointsx, pointsy, pointsz := arrows.GetMoveHitboxes()
 	quadx, quady, quadz := gohome.QuadMath2D(pointsx), gohome.QuadMath2D(pointsy), gohome.QuadMath2D(pointsz)
 
-	checkMouseIntersections(quadx, quady, quadz)
+	return checkMouseIntersections(quadx, quady, quadz)
 }
 
-func handleScaleArrowClick() {
+func handleScaleArrowClick() bool {
 	if selected_placed_object != nil {
 		transform_start_pos = selected_placed_object.Transform.GetPosition()
 		transform_start_scale = selected_placed_object.Transform.Scale
 	} else {
-		return
+		return false
 	}
 
 	pointsx, pointsy, pointsz := arrows.GetScaleHitboxes()
 	quadx, quady, quadz := gohome.QuadMath2D(pointsx), gohome.QuadMath2D(pointsy), gohome.QuadMath2D(pointsz)
 
-	checkMouseIntersections(quadx, quady, quadz)
+	return checkMouseIntersections(quadx, quady, quadz)
 }
 
 func getPlaneForIntersection(axis uint8) gohome.PlaneMath3D {
@@ -181,4 +182,83 @@ func handlePlacing() {
 	placePoint := mray.PlaneIntersect(camera.Position, plane.Normal, plane.Point)
 
 	placing_object.Transform.Position = placePoint
+}
+
+func initPickableTexture() {
+	pw, ph := gohome.RenderMgr.BackBuffer.GetWidth(), gohome.RenderMgr.BackBuffer.GetHeight()
+	pickable_texture = gohome.Render.CreateRenderTexture("Pickable Texture", uint32(pw), uint32(ph), 1, true, false, false, false)
+
+	gohome.ResourceMgr.LoadShaderSource("Pickable", PICKABLE_VERTEX_SHADER, PICKABLE_FRAGMENT_SHADER, "", "", "", "")
+}
+
+func renderPickableTexture() {
+	pickable_texture.SetAsTarget()
+	gohome.RenderMgr.ForceShader3D = gohome.ResourceMgr.GetShader("Pickable")
+
+	gohome.Render.ClearScreen(colornames.White)
+
+	for id, model := range placed_models {
+		gohome.RenderMgr.ForceShader3D.Use()
+		gohome.RenderMgr.ForceShader3D.SetUniformV4("pickableColor", idToColor(id))
+		gohome.RenderMgr.RenderRenderObject(&model.Entity3D)
+	}
+
+	gohome.RenderMgr.ForceShader3D = nil
+	pickable_texture.UnsetAsTarget()
+}
+
+func idToColor(id uint32) (col mgl32.Vec4) {
+	col[3] = 1.0 - (float32((id&0xFF000000)>>24) / 255.0)
+	col[2] = float32((id&0x00FF0000)>>16) / 255.0
+	col[1] = float32((id&0x0000FF00)>>8) / 255.0
+	col[0] = float32((id&0x000000FF)>>0) / 255.0
+
+	return
+}
+
+func colorToID(col mgl32.Vec4) (id uint32) {
+	for i := 0; i < 4; i++ {
+		if i == 3 {
+			id |= uint32((1.0-col[i])*255.0) << uint32(i*8)
+		} else {
+			id |= uint32(col[i]*255.0) << uint32(i*8)
+		}
+	}
+	return
+}
+
+func handlePickableClick() {
+	mpos := gohome.InputMgr.Mouse.ToScreenPosition()
+	mpos[1] = gohome.Render.GetNativeResolution()[1] - mpos[1]
+
+	pixel, w, h := pickable_texture.GetData()
+
+	if !(int(mpos[0]) < w && int(mpos[1]) < h && mpos[0] >= 0.0 && mpos[1] >= 0.0) {
+		return
+	}
+
+	arrayIndex := (int(mpos[0]) + int(mpos[1])*w) * 4
+
+	r := pixel[arrayIndex+0]
+	g := pixel[arrayIndex+1]
+	b := pixel[arrayIndex+2]
+	a := pixel[arrayIndex+3]
+
+	id := colorToID([4]float32{
+		float32(r) / 255.0,
+		float32(g) / 255.0,
+		float32(b) / 255.0,
+		float32(a) / 255.0,
+	})
+
+	placed_model, ok := placed_models[id]
+	if ok {
+		selected_placed_object = &placed_model.PlacedObject
+		arrows.SetParent(selected_placed_object)
+		arrows.SetVisible()
+		arrows.SetScale()
+	} else {
+		selected_placed_object = nil
+		arrows.SetInvisible()
+	}
 }

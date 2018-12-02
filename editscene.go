@@ -42,6 +42,7 @@ func (this *EditScene) InitGUI() {
 func (this *EditScene) InitGraphics() {
 	gohome.Render.SetBackgroundColor(colornames.Lightgray)
 	gohome.Init3DShaders()
+	gohome.Init2DShaders()
 	gohome.RenderMgr.UpdateProjectionWithViewport = true
 	gohome.ResourceMgr.LoadModelsWithSameName = true
 	dirl := &gohome.DirectionalLight{
@@ -53,6 +54,8 @@ func (this *EditScene) InitGraphics() {
 	}
 	gohome.LightMgr.AddDirectionalLight(dirl, 0)
 	gohome.LightMgr.SetAmbientLight(colornames.Darkgray, 0)
+
+	initPickableTexture()
 
 	updateResolution(gtk.GetGLArea().ToWidget())
 
@@ -125,6 +128,8 @@ func (this *EditScene) Update(delta_time float32) {
 		png.Encode(file, gohome.TextureToImage(gohome.RenderMgr.BackBuffer, false, true))
 		file.Close()
 	}
+
+	renderPickableTexture()
 }
 
 func (this *EditScene) Terminate() {

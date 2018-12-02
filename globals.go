@@ -36,3 +36,5 @@ var transform_start_scale mgl32.Vec3
 
 var grid Grid
 var place_on_grid = false
+
+var pickable_texture gohome.RenderTexture

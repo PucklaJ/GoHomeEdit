@@ -35,7 +35,7 @@ func allIntersected(intersected [3]uint8) bool {
 	return true
 }
 
-func checkMouseIntersections(quadx, quady, quadz gohome.QuadMath2D) {
+func checkMouseIntersections(quadx, quady, quadz gohome.QuadMath2D) bool {
 	intersect_channel := make(chan intersect_data)
 	var intersected = [3]uint8{2, 2, 2}
 	m := selected_placed_object
@@ -59,7 +59,9 @@ func checkMouseIntersections(quadx, quady, quadz gohome.QuadMath2D) {
 	for i := 0; i < 3; i++ {
 		if intersected[i] == 1 {
 			finishIntersection(uint8(i+1), mpos, m)
-			return
+			return true
 		}
 	}
+
+	return false
 }
