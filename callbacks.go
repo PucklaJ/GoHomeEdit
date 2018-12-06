@@ -10,6 +10,7 @@ func updateResolution(widget gtk.Widget) {
 	w, h := widget.GetSize()
 	gohome.Render.SetNativeResolution(uint32(w), uint32(h))
 	pickable_texture.ChangeSize(uint32(w), uint32(h))
+	gohome.RenderMgr.ReRender = true
 }
 
 func quitApplication(menuItem gtk.MenuItem) {
@@ -18,18 +19,22 @@ func quitApplication(menuItem gtk.MenuItem) {
 
 func onToolPlace(toolButton gtk.ToolButton) {
 	current_mode = MODE_PLACE
+	gohome.RenderMgr.ReRender = true
 }
 
 func onToolMove(toolButton gtk.ToolButton) {
 	current_mode = MODE_MOVE
+	gohome.RenderMgr.ReRender = true
 }
 
 func onToolRotate(toolButton gtk.ToolButton) {
 	current_mode = MODE_ROTATE
+	gohome.RenderMgr.ReRender = true
 }
 
 func onToolScale(toolButton gtk.ToolButton) {
 	current_mode = MODE_SCALE
+	gohome.RenderMgr.ReRender = true
 }
 
 func onToolLoadModel(toolButton gtk.ToolButton) {
@@ -67,10 +72,12 @@ var is_wireframe = false
 func onMenuWireframe(menuItem gtk.MenuItem) {
 	is_wireframe = !is_wireframe
 	gohome.RenderMgr.WireFrameMode = is_wireframe
+	gohome.RenderMgr.ReRender = true
 }
 
 func onMenuPlaceOnGrid(menuItem gtk.MenuItem) {
 	place_on_grid = !place_on_grid
+	gohome.RenderMgr.ReRender = true
 }
 
 func onSelectAsset(listBox gtk.ListBox, listBoxRow gtk.ListBoxRow) {
@@ -103,21 +110,30 @@ func onLeftClick() {
 			gohome.RenderMgr.AddObject(&pm.Entity3D)
 			pm.PlacedObject.Transform.Position = placing_object.Transform.Position
 			selected_placed_object = &pm.PlacedObject
+
+			gohome.RenderMgr.ReRender = true
 		}
 	} else if current_mode == MODE_MOVE {
 		if !handleMoveArrowClick() {
 			handlePickableClick()
+		} else {
+			gohome.RenderMgr.ReRender = true
 		}
 	} else if current_mode == MODE_SCALE {
 		if !handleScaleArrowClick() {
 			handlePickableClick()
+		} else {
+			gohome.RenderMgr.ReRender = true
 		}
 	}
 }
 
 func onLeftClickRelease() {
-	is_transforming = false
-	arrows.TransformAxis = 0
-	arrows.ResetPosition()
-	arrows.SetScale()
+	if is_transforming {
+		is_transforming = false
+		arrows.TransformAxis = 0
+		arrows.ResetPosition()
+		arrows.SetScale()
+		gohome.RenderMgr.ReRender = true
+	}
 }

@@ -73,6 +73,7 @@ func updateCameraRotation() {
 	if gohome.InputMgr.IsPressed(gohome.MouseButtonRight) && (gohome.InputMgr.IsPressed(gohome.KeyLeftShift) || gohome.InputMgr.IsPressed(gohome.KeyRightShift)) {
 		dx, dy = 0.0, 0.0
 		camera_pitch, camera_yaw = 3.1415/4.0, 3.1415/4.0
+		gohome.RenderMgr.ReRender = true
 	} else {
 		smooth_deltas[current_smooth_delta][0] = dx
 		smooth_deltas[current_smooth_delta][1] = dy
@@ -80,6 +81,9 @@ func updateCameraRotation() {
 		if mgl32.Abs(dx) > MAX_DELTA || mgl32.Abs(dy) > MAX_DELTA {
 			return
 		}
+	}
+	if dx != 0.0 || dy != 0.0 {
+		gohome.RenderMgr.ReRender = true
 	}
 	yaw, pitch := mgl32.DegToRad(-dx*CAM_ROTATE_VELOCITY), mgl32.DegToRad(dy*CAM_ROTATE_VELOCITY)
 
@@ -133,10 +137,14 @@ func updateCameraZoom() {
 	zoom := wy * CAM_ZOOM_VELOCITY
 	if zoom != 0.0 && (gohome.InputMgr.IsPressed(gohome.KeyLeftShift) || gohome.InputMgr.IsPressed(gohome.KeyRightShift)) {
 		camera_zoom = MID_ZOOM
+		gohome.RenderMgr.ReRender = true
 	} else {
 		smooth_zooms[current_smooth_zoom] = zoom
 		zoom = smoothZooms()
 		camera_zoom = mgl32.Clamp(camera_zoom-zoom, MIN_ZOOM, MAX_ZOOM)
+	}
+	if zoom != 0.0 {
+		gohome.RenderMgr.ReRender = true
 	}
 
 	PLACE_PLANE_DIST = camera_zoom
@@ -174,6 +182,9 @@ func updateCameraPanning() {
 	dx, dy = smoothPans()
 	if mgl32.Abs(dx) > MAX_DELTA || mgl32.Abs(dy) > MAX_DELTA {
 		return
+	}
+	if dx != 0.0 || dy != 0.0 {
+		gohome.RenderMgr.ReRender = true
 	}
 
 	panx, pany := dx*CAM_PAN_VELOCITY, dy*CAM_PAN_VELOCITY

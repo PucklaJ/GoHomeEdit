@@ -64,6 +64,9 @@ func (this *EditScene) InitGraphics() {
 	arrows.Init()
 	placing_object.Init()
 	grid.Init()
+
+	gohome.RenderMgr.AutoRender = false
+	gohome.RenderMgr.ReRender = true
 }
 
 func (this *EditScene) InitTest() {

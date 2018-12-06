@@ -136,6 +136,10 @@ func handleTransforming() {
 		cam_dist := camera.Position.Sub(transform_start_pos).Len()
 		selected_placed_object.Transform.Scale[arrows.TransformAxis-1] = transform_start_scale[arrows.TransformAxis-1] + len_dif*TRANSFORM_SCALE_SPEED/cam_dist
 	}
+
+	if gohome.InputMgr.Mouse.DPos[0] != 0 || gohome.InputMgr.Mouse.DPos[1] != 0 {
+		gohome.RenderMgr.ReRender = true
+	}
 }
 
 func getBestPlane(planes [4]gohome.PlaneMath3D) gohome.PlaneMath3D {
@@ -182,6 +186,10 @@ func handlePlacing() {
 	placePoint := mray.PlaneIntersect(camera.Position, plane.Normal, plane.Point)
 
 	placing_object.Transform.Position = placePoint
+
+	if gohome.InputMgr.Mouse.DPos[0] != 0 || gohome.InputMgr.Mouse.DPos[1] != 0 {
+		gohome.RenderMgr.ReRender = true
+	}
 }
 
 func initPickableTexture() {
@@ -251,6 +259,7 @@ func handlePickableClick() {
 		float32(a) / 255.0,
 	})
 
+	prev := selected_placed_object
 	placed_model, ok := placed_models[id]
 	if ok {
 		selected_placed_object = &placed_model.PlacedObject
@@ -260,5 +269,9 @@ func handlePickableClick() {
 	} else {
 		selected_placed_object = nil
 		arrows.SetInvisible()
+	}
+
+	if prev != selected_placed_object {
+		gohome.RenderMgr.ReRender = true
 	}
 }
