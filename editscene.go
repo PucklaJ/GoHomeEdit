@@ -136,5 +136,7 @@ func (this *EditScene) Update(delta_time float32) {
 }
 
 func (this *EditScene) Terminate() {
-
+	for _, ent := range instanced_entities {
+		ent.Terminate()
+	}
 }

@@ -21,7 +21,7 @@ func stringToUint32(str string) uint32 {
 
 func loadModel(name, fileContents, fileName string) {
 	gohome.ErrorMgr.Log("Load", "Model", name)
-	gohome.ResourceMgr.LoadLevelString(name, string(fileContents), fileName, false)
+	gohome.ResourceMgr.LoadLevelString(name, string(fileContents), fileName, true)
 
 	level := gohome.ResourceMgr.GetLevel(name)
 	if level != nil && len(level.LevelObjects) != 0 {
