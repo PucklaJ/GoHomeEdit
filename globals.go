@@ -40,3 +40,4 @@ var place_on_grid = false
 var pickable_texture gohome.RenderTexture
 
 var instanced_entities map[PlaceableObject]*gohome.InstancedEntity3D
+var pickable_colors map[*gohome.InstancedEntity3D][]mgl32.Vec4

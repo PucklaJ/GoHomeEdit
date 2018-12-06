@@ -4,7 +4,9 @@ import (
 	"encoding/binary"
 	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK/gtk"
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
+	"github.com/PucklaMotzer09/gohomeengine/src/renderers/OpenGL"
 	"github.com/PucklaMotzer09/mathgl/mgl32"
+	"golang.org/x/image/colornames"
 	"math"
 )
 
@@ -194,24 +196,27 @@ func handlePlacing() {
 func initPickableTexture() {
 	pw, ph := gohome.RenderMgr.BackBuffer.GetWidth(), gohome.RenderMgr.BackBuffer.GetHeight()
 	pickable_texture = gohome.Render.CreateRenderTexture("Pickable Texture", uint32(pw), uint32(ph), 1, true, false, false, false)
+	render := gohome.Render.(*renderer.OpenGLRenderer)
 
-	gohome.ResourceMgr.LoadShaderSource("Pickable", PICKABLE_VERTEX_SHADER, PICKABLE_FRAGMENT_SHADER, "", "", "", "")
+	if render.HasFunctionAvailable("INSTANCED") {
+		gohome.ResourceMgr.LoadShaderSource("Pickable", PICKABLE_INSTANCED_VERTEX_SHADER, PICKABLE_INSTANCED_FRAGMENT_SHADER, "", "", "", "")
+	} else {
+		gohome.ResourceMgr.LoadShaderSource("Pickable", PICKABLE_VERTEX_SHADER, PICKABLE_FRAGMENT_SHADER, "", "", "", "")
+	}
 }
 
 func renderPickableTexture() {
-	/*pickable_texture.SetAsTarget()
+	pickable_texture.SetAsTarget()
 	gohome.RenderMgr.ForceShader3D = gohome.ResourceMgr.GetShader("Pickable")
 
 	gohome.Render.ClearScreen(colornames.White)
-
-	for id, model := range placed_models {
-		gohome.RenderMgr.ForceShader3D.Use()
-		gohome.RenderMgr.ForceShader3D.SetUniformV4("pickableColor", idToColor(id))
-		gohome.RenderMgr.RenderRenderObject(&model.Entity3D)
+	for _, ent := range instanced_entities {
+		ent.Model3D.SetV4(0, pickable_colors[ent])
 	}
+	gohome.RenderMgr.Render(PICKABLE_BIT, 0, 0, 0)
 
 	gohome.RenderMgr.ForceShader3D = nil
-	pickable_texture.UnsetAsTarget()*/
+	pickable_texture.UnsetAsTarget()
 }
 
 func idToColor(id uint32) (col mgl32.Vec4) {

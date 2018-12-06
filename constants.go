@@ -2079,4 +2079,35 @@ const (
 	{
 		gl_FragColor = pickableColor;
 	}`
+
+	PICKABLE_INSTANCED_VERTEX_SHADER = `
+	#version 110
+	
+	attribute vec3 vertex;
+	attribute vec3 normal;
+	attribute vec2 texCoord;
+	attribute vec3 tangent;
+	attribute mat4 transformMatrix3D;
+	attribute vec4 pickableColor;
+
+	varying vec4 fragPickableColor;
+	
+	uniform mat4 viewMatrix3D;
+	uniform mat4 projectionMatrix3D;
+	
+	void main()
+	{
+		gl_Position = projectionMatrix3D*viewMatrix3D*transformMatrix3D*vec4(vertex,1.0);
+		fragPickableColor = pickableColor;
+	}`
+
+	PICKABLE_INSTANCED_FRAGMENT_SHADER = `
+	#version 110
+	
+	varying vec4 fragPickableColor;
+	
+	void main()
+	{
+		gl_FragColor = fragPickableColor;
+	}`
 )

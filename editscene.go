@@ -132,7 +132,9 @@ func (this *EditScene) Update(delta_time float32) {
 		file.Close()
 	}
 
-	renderPickableTexture()
+	if gohome.RenderMgr.ReRender {
+		renderPickableTexture()
+	}
 }
 
 func (this *EditScene) Terminate() {
