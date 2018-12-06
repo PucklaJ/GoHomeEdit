@@ -40,7 +40,6 @@ func (this *PlacedObject) GetTransform3D() *gohome.TransformableObject3D {
 }
 
 type PlacedModel struct {
-	gohome.Entity3D
 	PlacedObject
 	*PlaceableModel
 }

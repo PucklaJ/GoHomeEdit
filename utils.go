@@ -5,7 +5,6 @@ import (
 	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK/gtk"
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
 	"github.com/PucklaMotzer09/mathgl/mgl32"
-	"golang.org/x/image/colornames"
 	"math"
 )
 
@@ -22,7 +21,7 @@ func stringToUint32(str string) uint32 {
 
 func loadModel(name, fileContents, fileName string) {
 	gohome.ErrorMgr.Log("Load", "Model", name)
-	gohome.ResourceMgr.LoadLevelString(name, string(fileContents), fileName, true)
+	gohome.ResourceMgr.LoadLevelString(name, string(fileContents), fileName, false)
 
 	level := gohome.ResourceMgr.GetLevel(name)
 	if level != nil && len(level.LevelObjects) != 0 {
@@ -200,7 +199,7 @@ func initPickableTexture() {
 }
 
 func renderPickableTexture() {
-	pickable_texture.SetAsTarget()
+	/*pickable_texture.SetAsTarget()
 	gohome.RenderMgr.ForceShader3D = gohome.ResourceMgr.GetShader("Pickable")
 
 	gohome.Render.ClearScreen(colornames.White)
@@ -212,7 +211,7 @@ func renderPickableTexture() {
 	}
 
 	gohome.RenderMgr.ForceShader3D = nil
-	pickable_texture.UnsetAsTarget()
+	pickable_texture.UnsetAsTarget()*/
 }
 
 func idToColor(id uint32) (col mgl32.Vec4) {

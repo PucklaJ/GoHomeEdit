@@ -38,3 +38,5 @@ var grid Grid
 var place_on_grid = false
 
 var pickable_texture gohome.RenderTexture
+
+var instanced_entities map[PlaceableObject]*gohome.InstancedEntity3D

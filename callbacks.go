@@ -94,20 +94,36 @@ func onLeftClick() {
 			if placed_models == nil {
 				placed_models = make(map[uint32]*PlacedModel)
 			}
+			if instanced_entities == nil {
+				instanced_entities = make(map[PlaceableObject]*gohome.InstancedEntity3D)
+			}
 
 			model := loaded_models[pmodel.ID]
+			entity, entok := instanced_entities[pmodel.PlaceableObject]
 			var pm PlacedModel
-			pm.Entity3D.InitModel(model)
-			pm.Entity3D.SetType(gohome.TYPE_3D_NORMAL | PICKABLE_BIT)
-			pm.PlacedObject.Transform = pm.Entity3D.Transform
-			pm.PlacedObject.AABB = model.AABB
+			if !entok {
+				imodel := gohome.InstancedModel3DFromModel3D(model)
+				entity = &gohome.InstancedEntity3D{}
+				entity.InitModel(imodel, 10)
+				entity.SetType(gohome.TYPE_3D_INSTANCED | PICKABLE_BIT)
+				entity.SetNumUsedInstances(0)
+				instanced_entities[pmodel.PlaceableObject] = entity
+				gohome.RenderMgr.AddObject(entity)
+			}
+			index := entity.Model3D.GetNumUsedInstances()
+			entity.SetNumUsedInstances(entity.Model3D.GetNumUsedInstances() + 1)
+			if entity.Model3D.GetNumUsedInstances() > entity.Model3D.GetNumInstances() {
+				entity.SetNumInstances(entity.Model3D.GetNumInstances() + 10)
+				entity.SetNumUsedInstances(entity.Model3D.GetNumInstances() - 9)
+			}
+			pm.PlacedObject.Transform = &entity.Transforms[index].TransformableObject3D
+			pm.PlacedObject.AABB = entity.Model3D.AABB
 			pm.PlacedObject.PlaceID = place_id
 			pm.PlaceableModel = pmodel
 			placed_models[place_id] = &pm
 
 			place_id++
 
-			gohome.RenderMgr.AddObject(&pm.Entity3D)
 			pm.PlacedObject.Transform.Position = placing_object.Transform.Position
 			selected_placed_object = &pm.PlacedObject
 
