@@ -41,8 +41,7 @@ func (this *EditScene) InitGUI() {
 
 func (this *EditScene) InitGraphics() {
 	gohome.Render.SetBackgroundColor(colornames.Lightgray)
-	gohome.Init3DShaders()
-	gohome.Init2DShaders()
+	gohome.GenerateShaderSource3D()
 	gohome.RenderMgr.UpdateProjectionWithViewport = true
 	gohome.ResourceMgr.LoadModelsWithSameName = true
 	dirl := &gohome.DirectionalLight{
