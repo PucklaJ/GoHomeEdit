@@ -127,7 +127,7 @@ func (this *EditScene) Update(delta_time float32) {
 
 	if gohome.InputMgr.JustPressed(gohome.KeyJ) {
 		file, _ := os.Create("screenshot.png")
-		png.Encode(file, gohome.TextureToImage(gohome.RenderMgr.BackBuffer, false, true))
+		png.Encode(file, gohome.TextureToImage(gohome.RenderMgr.BackBufferMS, false, true))
 		file.Close()
 	}
 
