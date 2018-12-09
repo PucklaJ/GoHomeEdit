@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK/gtk"
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
-	"github.com/PucklaMotzer09/gohomeengine/src/renderers/OpenGL"
 	"github.com/PucklaMotzer09/mathgl/mgl32"
 	"golang.org/x/image/colornames"
 	"math"
@@ -196,9 +195,8 @@ func handlePlacing() {
 func initPickableTexture() {
 	pw, ph := gohome.RenderMgr.BackBuffer.GetWidth(), gohome.RenderMgr.BackBuffer.GetHeight()
 	pickable_texture = gohome.Render.CreateRenderTexture("Pickable Texture", uint32(pw), uint32(ph), 1, true, false, false, false)
-	render := gohome.Render.(*renderer.OpenGLRenderer)
 
-	if render.HasFunctionAvailable("INSTANCED") {
+	if gohome.Render.HasFunctionAvailable("INSTANCED") {
 		gohome.ResourceMgr.LoadShaderSource("Pickable", PICKABLE_INSTANCED_VERTEX_SHADER, PICKABLE_INSTANCED_FRAGMENT_SHADER, "", "", "", "")
 	} else {
 		gohome.ResourceMgr.LoadShaderSource("Pickable", PICKABLE_VERTEX_SHADER, PICKABLE_FRAGMENT_SHADER, "", "", "", "")

@@ -10,21 +10,6 @@ type PlacingObject struct {
 }
 
 func (this *PlacingObject) Init() {
-	gohome.ResourceMgr.LoadShaderSource("PlacingObject", gohome.ENTITY_3D_SHADER_VERTEX_SOURCE_OPENGL, PLACING_OBJECT_SHADER_FRAGMENT_SOURCE_OPENGL, "", "", "", "")
-	if gohome.ResourceMgr.GetShader("PlacingObject") == nil {
-		gohome.ResourceMgr.LoadShaderSource("PlacingObjectNoShadow", gohome.ENTITY_3D_NO_SHADOWS_SHADER_VERTEX_SOURCE_OPENGL, PLACING_OBJECT_NO_SHADOWS_SHADER_FRAGMENT_SOURCE_OPENGL, "", "", "", "")
-		if gohome.ResourceMgr.GetShader("PlacingObjectNoShadow") != nil {
-			gohome.ResourceMgr.SetShader("PlacingObject", "PlacingObjectNoShadow")
-		}
-	}
-	gohome.ResourceMgr.LoadShaderSource("PlacingObjectNoUV", gohome.ENTITY_3D_NOUV_SHADER_VERTEX_SOURCE_OPENGL, PLACING_MODEL_NOUV_SHADER_FRAGMENT_SOURCE_OPENGL, "", "", "", "")
-	if gohome.ResourceMgr.GetShader("PlacingObjectNoUV") == nil {
-		gohome.ResourceMgr.LoadShaderSource("PlacingObjectNoUVNoShadow", gohome.ENTITY_3D_NOUV_SHADER_VERTEX_SOURCE_OPENGL, PLACING_OBJECT_NOUV_NO_SHADOWS_SHADER_FRAGMENT_SOURCE_OPENGL, "", "", "", "")
-		if gohome.ResourceMgr.GetShader("PlacingObjectNoUVNoShadow") != nil {
-			gohome.ResourceMgr.SetShader("PlacingObjectNoUV", "PlacingObjectNoUVNoShadow")
-		}
-	}
-
 	this.Visible = false
 	this.RenderLast = true
 	gohome.RenderMgr.AddObject(this)
@@ -38,13 +23,14 @@ func (this *PlacingObject) Update(delta_time float32) {
 		pmodel, ok := placable_models[selected_model]
 		if ok {
 			model := loaded_models[pmodel.ID]
-			this.InitModel(model)
-			this.RenderLast = true
-			if model.HasUV() {
-				this.SetShader(gohome.ResourceMgr.GetShader("PlacingObject"))
-			} else {
-				this.SetShader(gohome.ResourceMgr.GetShader("PlacingObjectNoUV"))
+			placemodel := model.Copy()
+			mesh := placemodel.GetMeshIndex(0)
+			for i := 0; mesh != nil; i++ {
+				mesh.GetMaterial().Transparency = 0.5
+				mesh = placemodel.GetMeshIndex(uint32(i + 1))
 			}
+			this.InitModel(placemodel)
+			this.RenderLast = true
 		}
 		this.prev_selected_model = selected_model
 	}
