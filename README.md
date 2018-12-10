@@ -4,7 +4,7 @@
 
 A framework independent 3D Level editor (in development)
 
-This level editor is developed because of the lack of a framework independent 3d level editor which can be implemented into every game engine or framework. For 2D games there already is one, [Tiled](https://mapeditor.org), but for 3D I could only find some which are not in development anymore. So I came to the conclusion to program my own.
+This level editor is developed because of the lack of a framework independent 3d level editor which can be implemented into every game engine or framework. For 2D games there already is one, [Tiled](https://www.mapeditor.org), but for 3D I could only find some which are not in development anymore. So I came to the conclusion to program my own.
 
 ## Features
 + Loading of 3D Models (.obj)
