@@ -1,7 +1,7 @@
 package main
 
 import (
-	framework "github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK"
+	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK"
 	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK/gtk"
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
 	"github.com/PucklaMotzer09/mathgl/mgl32"
@@ -41,7 +41,6 @@ func (this *EditScene) InitGUI() {
 
 func (this *EditScene) InitGraphics() {
 	gohome.Render.SetBackgroundColor(colornames.Lightgray)
-	gohome.GenerateShaderSource3D()
 	gohome.RenderMgr.UpdateProjectionWithViewport = true
 	gohome.ResourceMgr.LoadModelsWithSameName = true
 	dirl := &gohome.DirectionalLight{
