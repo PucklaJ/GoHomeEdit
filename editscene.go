@@ -65,6 +65,8 @@ func (this *EditScene) InitGraphics() {
 
 	gohome.RenderMgr.AutoRender = false
 	gohome.RenderMgr.ReRender = true
+
+	initMaps()
 }
 
 func (this *EditScene) InitTest() {
@@ -139,4 +141,5 @@ func (this *EditScene) Terminate() {
 	for _, ent := range instanced_entities {
 		ent.Terminate()
 	}
+	pickable_texture.Terminate()
 }

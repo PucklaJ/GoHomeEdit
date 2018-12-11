@@ -29,12 +29,6 @@ func loadModel(name, fileContents, fileName string) {
 		for i := 0; i < len(level.LevelObjects); i++ {
 			model := level.LevelObjects[i].Model3D
 			if model != nil {
-				if loaded_models == nil {
-					loaded_models = make(map[uint32]*gohome.Model3D)
-				}
-				if placable_models == nil {
-					placable_models = make(map[uint32]*PlaceableModel)
-				}
 				loaded_models[object_id] = model
 
 				lbl := gtk.LabelNew(model.Name)
@@ -46,8 +40,10 @@ func loadModel(name, fileContents, fileName string) {
 				pm.Name = model.Name
 				pm.Filename = fileName
 				pm.ID = object_id
-				placable_models[object_id] = &pm
+				placeable_models[object_id] = &pm
 				object_id++
+
+				addEntityModel(pm.PlaceableObject, &pm)
 			}
 		}
 
@@ -276,4 +272,75 @@ func handlePickableClick() {
 	if prev != selected_placed_object {
 		gohome.RenderMgr.ReRender = true
 	}
+}
+
+func addEntityModel(object PlaceableObject, model *PlaceableModel) {
+	imodel := gohome.InstancedModel3DFromModel3D(loaded_models[object.ID])
+	entity := &gohome.InstancedEntity3D{}
+	imodel.AddValue(gohome.VALUE_VEC4)
+	imodel.SetName(0, gohome.VALUE_VEC4, "pickableColor")
+	entity.InitModel(imodel, 10)
+	entity.SetType(gohome.TYPE_3D_INSTANCED | PICKABLE_BIT)
+	entity.SetNumUsedInstances(0)
+	instanced_entities[object] = entity
+	gohome.RenderMgr.AddObject(entity)
+	pickable_colors[entity] = make([]mgl32.Vec4, 10)
+}
+
+func addEntityInstance(object PlaceableObject) {
+	entity := instanced_entities[object]
+	index := entity.Model3D.GetNumUsedInstances()
+	entity.SetNumUsedInstances(index + 1)
+	if entity.Model3D.GetNumUsedInstances() > entity.Model3D.GetNumInstances() {
+		entity.SetNumInstances(entity.Model3D.GetNumInstances() + 10)
+		entity.SetNumUsedInstances(entity.Model3D.GetNumInstances() - 9)
+		pickable_colors[entity] = append(pickable_colors[entity], make([]mgl32.Vec4, 10)...)
+	}
+	pickable_colors[entity][index] = idToColor(place_id)
+}
+
+func handlePlaceClick() {
+	pmodel, ok := placeable_models[selected_model]
+	if ok {
+		entity := instanced_entities[pmodel.PlaceableObject]
+		var pm PlacedModel
+		index := entity.Model3D.GetNumUsedInstances()
+		addEntityInstance(pmodel.PlaceableObject)
+		pm.PlacedObject.Transform = &entity.Transforms[index].TransformableObject3D
+		pm.PlacedObject.AABB = entity.Model3D.AABB
+		pm.PlacedObject.PlaceID = place_id
+		pm.PlaceableModel = pmodel
+		placed_models[place_id] = &pm
+
+		place_id++
+
+		pm.PlacedObject.Transform.Position = placing_object.Transform.Position
+		selected_placed_object = &pm.PlacedObject
+
+		gohome.RenderMgr.ReRender = true
+	}
+}
+
+func handleMoveClick() {
+	if !handleMoveArrowClick() {
+		handlePickableClick()
+	} else {
+		gohome.RenderMgr.ReRender = true
+	}
+}
+
+func handleScaleClick() {
+	if !handleScaleArrowClick() {
+		handlePickableClick()
+	} else {
+		gohome.RenderMgr.ReRender = true
+	}
+}
+
+func initMaps() {
+	placed_models = make(map[uint32]*PlacedModel)
+	instanced_entities = make(map[PlaceableObject]*gohome.InstancedEntity3D)
+	pickable_colors = make(map[*gohome.InstancedEntity3D][]mgl32.Vec4)
+	loaded_models = make(map[uint32]*gohome.Model3D)
+	placeable_models = make(map[uint32]*PlaceableModel)
 }

@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/PucklaMotzer09/gohomeengine/src/frameworks/GTK/gtk"
 	"github.com/PucklaMotzer09/gohomeengine/src/gohome"
-	"github.com/PucklaMotzer09/mathgl/mgl32"
 	"io/ioutil"
 )
 
@@ -86,70 +85,17 @@ func onSelectAsset(listBox gtk.ListBox, listBoxRow gtk.ListBoxRow) {
 	data := lbl.ToGObject().GetData("ID")
 	id := stringToUint32(data)
 	selected_model = id
+	current_mode = MODE_PLACE
+	gohome.RenderMgr.ReRender = true
 }
 
 func onLeftClick() {
 	if current_mode == MODE_PLACE {
-		pmodel, ok := placable_models[selected_model]
-		if ok {
-			if placed_models == nil {
-				placed_models = make(map[uint32]*PlacedModel)
-			}
-			if instanced_entities == nil {
-				instanced_entities = make(map[PlaceableObject]*gohome.InstancedEntity3D)
-			}
-			if pickable_colors == nil {
-				pickable_colors = make(map[*gohome.InstancedEntity3D][]mgl32.Vec4)
-			}
-
-			model := loaded_models[pmodel.ID]
-			entity, entok := instanced_entities[pmodel.PlaceableObject]
-			var pm PlacedModel
-			if !entok {
-				imodel := gohome.InstancedModel3DFromModel3D(model)
-				entity = &gohome.InstancedEntity3D{}
-				imodel.AddValue(gohome.VALUE_VEC4)
-				imodel.SetName(0, gohome.VALUE_VEC4, "pickableColor")
-				entity.InitModel(imodel, 10)
-				entity.SetType(gohome.TYPE_3D_INSTANCED | PICKABLE_BIT)
-				entity.SetNumUsedInstances(0)
-				instanced_entities[pmodel.PlaceableObject] = entity
-				gohome.RenderMgr.AddObject(entity)
-				pickable_colors[entity] = make([]mgl32.Vec4, 10)
-			}
-			index := entity.Model3D.GetNumUsedInstances()
-			entity.SetNumUsedInstances(entity.Model3D.GetNumUsedInstances() + 1)
-			if entity.Model3D.GetNumUsedInstances() > entity.Model3D.GetNumInstances() {
-				entity.SetNumInstances(entity.Model3D.GetNumInstances() + 10)
-				entity.SetNumUsedInstances(entity.Model3D.GetNumInstances() - 9)
-				pickable_colors[entity] = append(pickable_colors[entity], make([]mgl32.Vec4, 10)...)
-			}
-			pickable_colors[entity][index] = idToColor(place_id)
-			pm.PlacedObject.Transform = &entity.Transforms[index].TransformableObject3D
-			pm.PlacedObject.AABB = entity.Model3D.AABB
-			pm.PlacedObject.PlaceID = place_id
-			pm.PlaceableModel = pmodel
-			placed_models[place_id] = &pm
-
-			place_id++
-
-			pm.PlacedObject.Transform.Position = placing_object.Transform.Position
-			selected_placed_object = &pm.PlacedObject
-
-			gohome.RenderMgr.ReRender = true
-		}
+		handlePlaceClick()
 	} else if current_mode == MODE_MOVE {
-		if !handleMoveArrowClick() {
-			handlePickableClick()
-		} else {
-			gohome.RenderMgr.ReRender = true
-		}
+		handleMoveClick()
 	} else if current_mode == MODE_SCALE {
-		if !handleScaleArrowClick() {
-			handlePickableClick()
-		} else {
-			gohome.RenderMgr.ReRender = true
-		}
+		handleScaleClick()
 	}
 }
 

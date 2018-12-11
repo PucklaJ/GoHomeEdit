@@ -20,7 +20,7 @@ func (this *PlacingObject) Init() {
 
 func (this *PlacingObject) Update(delta_time float32) {
 	if this.prev_selected_model != selected_model || this.Model3D == nil {
-		pmodel, ok := placable_models[selected_model]
+		pmodel, ok := placeable_models[selected_model]
 		if ok {
 			model := loaded_models[pmodel.ID]
 			placemodel := model.Copy()
