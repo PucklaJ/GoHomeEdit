@@ -39,6 +39,10 @@ func (this *PlacedObject) GetTransform3D() *gohome.TransformableObject3D {
 	return this.Transform
 }
 
+func (this *PlacedObject) SetChildChannel(channel chan bool, tobj *gohome.TransformableObject3D) {
+	this.Transform.SetChildChannel(channel, tobj)
+}
+
 type PlacedModel struct {
 	PlacedObject
 	*PlaceableModel
