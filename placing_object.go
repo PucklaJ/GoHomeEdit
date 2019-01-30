@@ -27,7 +27,7 @@ func (this *PlacingObject) Update(delta_time float32) {
 			mesh := placemodel.GetMeshIndex(0)
 			for i := 0; mesh != nil; i++ {
 				mesh.GetMaterial().Transparency = 0.5
-				mesh = placemodel.GetMeshIndex(uint32(i + 1))
+				mesh = placemodel.GetMeshIndex(i + 1)
 			}
 			this.InitModel(placemodel)
 			this.RenderLast = true

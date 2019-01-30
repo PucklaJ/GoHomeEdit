@@ -189,7 +189,7 @@ func handlePlacing() {
 
 func initPickableTexture() {
 	pw, ph := gohome.RenderMgr.BackBufferMS.GetWidth(), gohome.RenderMgr.BackBufferMS.GetHeight()
-	pickable_texture = gohome.Render.CreateRenderTexture("Pickable Texture", uint32(pw), uint32(ph), 1, true, false, false, false)
+	pickable_texture = gohome.Render.CreateRenderTexture("Pickable Texture", pw, ph, 1, true, false, false, false)
 
 	if gohome.Render.HasFunctionAvailable("INSTANCED") {
 		gohome.ResourceMgr.LoadShaderSource("Pickable", PICKABLE_INSTANCED_VERTEX_SHADER, PICKABLE_INSTANCED_FRAGMENT_SHADER, "", "", "", "")

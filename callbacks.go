@@ -8,8 +8,8 @@ import (
 
 func updateResolution(widget gtk.Widget) {
 	w, h := widget.GetSize()
-	gohome.Render.SetNativeResolution(uint32(w), uint32(h))
-	pickable_texture.ChangeSize(uint32(w), uint32(h))
+	gohome.Render.SetNativeResolution(int(w), int(h))
+	pickable_texture.ChangeSize(int(w), int(h))
 	gohome.RenderMgr.ReRender = true
 }
 
