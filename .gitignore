@@ -1,5 +1,6 @@
 .*
 !.gitignore
+!.gohome.config
 GoHomeEdit
 *.exe
 *~
